@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Release Notes Generator for LegalPro Case Management System
+# Release Notes Generator for LegalPro v1.0.1 Case Management System
 
 # Colors for output
 GREEN='\033[0;32m'

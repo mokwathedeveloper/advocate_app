@@ -1,3 +1,4 @@
+// Case management routes for LegalPro v1.0.1
 const express = require('express');
 const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');

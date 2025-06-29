@@ -1,3 +1,4 @@
+// Navigation bar component for LegalPro v1.0.1
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 

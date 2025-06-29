@@ -1,3 +1,4 @@
+// Authentication controller for LegalPro v1.0.1
 const crypto = require('crypto');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');

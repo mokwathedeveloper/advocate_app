@@ -1,3 +1,4 @@
+// Payment service for LegalPro v1.0.1
 import axios from 'axios';
 
 const API_URL = (import.meta.env as any).VITE_API_URL || 'http://localhost:5000/api';

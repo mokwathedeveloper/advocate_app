@@ -1,4 +1,4 @@
-# Code Index - Advocate Case Management System
+# Code Index - LegalPro v1.0.1 - Advocate Case Management System
 
 ## Project Overview
 A full-stack case management system for legal professionals built with React (TypeScript) frontend and Node.js/Express backend.

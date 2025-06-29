@@ -1,3 +1,4 @@
+// Reusable Input component for LegalPro v1.0.1
 import React from 'react';
 import { clsx } from 'clsx';
 

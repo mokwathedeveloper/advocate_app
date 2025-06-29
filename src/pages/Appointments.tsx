@@ -1,3 +1,4 @@
+// Appointments scheduling page for LegalPro v1.0.1
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';

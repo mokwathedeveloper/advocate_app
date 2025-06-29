@@ -1,4 +1,5 @@
 #!/bin/bash
+# Git workflow automation script for LegalPro v1.0.1
 
 # Git Workflow Management Script for LegalPro Case Management System
 

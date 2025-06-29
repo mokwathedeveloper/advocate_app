@@ -1,4 +1,5 @@
 const MpesaService = require('../utils/mpesaService');
+// Payment processing controller for LegalPro v1.0.1
 const Payment = require('../models/Payment');
 
 // Initiate M-Pesa payment

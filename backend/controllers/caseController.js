@@ -1,3 +1,4 @@
+// Case management controller for LegalPro v1.0.1
 const Case = require('../models/Case');
 const User = require('../models/User');
 

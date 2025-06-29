@@ -1,3 +1,4 @@
+// About page component for LegalPro v1.0.1
 import React from 'react';
 import { motion } from 'framer-motion';
 import { 

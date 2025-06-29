@@ -1,3 +1,4 @@
+// ESLint configuration for LegalPro v1.0.1
 import js from '@eslint/js';
 import globals from 'globals';
 import reactHooks from 'eslint-plugin-react-hooks';

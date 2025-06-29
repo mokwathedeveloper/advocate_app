@@ -1,4 +1,4 @@
-# LegalPro - Advocate Case Management System
+# LegalPro - Advocate Case Management System v1.0.1
 
 [![CI/CD Pipeline](https://github.com/mokwathedeveloper/advocate_app/actions/workflows/ci.yml/badge.svg)](https://github.com/mokwathedeveloper/advocate_app/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

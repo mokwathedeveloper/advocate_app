@@ -1,3 +1,4 @@
+// Authentication service for LegalPro v1.0.1
 import axios from 'axios';
 import { User, RegisterData } from '../types';
 

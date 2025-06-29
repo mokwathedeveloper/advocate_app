@@ -1,3 +1,4 @@
+// API service layer for LegalPro v1.0.1
 import axios from 'axios';
 import { Case, Appointment, Payment, ChatMessage } from '../types';
 

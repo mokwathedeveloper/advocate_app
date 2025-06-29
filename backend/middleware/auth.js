@@ -1,3 +1,4 @@
+// Authentication middleware for LegalPro v1.0.1
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 

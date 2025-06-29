@@ -1,0 +1,128 @@
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: 'advocate' | 'admin' | 'client'; // advocate is the highest level (super admin)
+  phone?: string;
+  avatar?: string;
+  // Advocate-specific fields (for super admin advocates)
+  licenseNumber?: string;
+  specialization?: string[];
+  experience?: number;
+  education?: string;
+  barAdmission?: string;
+  isVerified?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Case {
+  id: string;
+  clientId: string;
+  title: string;
+  description: string;
+  category: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'closed';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  assignedTo?: string;
+  courtDate?: string;
+  documents: Document[];
+  notes: CaseNote[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Document {
+  id: string;
+  caseId: string;
+  name: string;
+  type: string;
+  size: number;
+  url: string;
+  uploadedBy: string;
+  uploadedAt: string;
+}
+
+export interface CaseNote {
+  id: string;
+  caseId: string;
+  content: string;
+  author: string;
+  isPrivate: boolean;
+  createdAt: string;
+}
+
+export interface Appointment {
+  id: string;
+  clientId: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  duration: number;
+  status: 'scheduled' | 'confirmed' | 'completed' | 'cancelled';
+  type: 'consultation' | 'follow_up' | 'court_appearance';
+  location?: string;
+  meetingLink?: string;
+  fee?: number;
+  paymentStatus?: 'pending' | 'paid' | 'failed';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Payment {
+  id: string;
+  clientId: string;
+  appointmentId?: string;
+  amount: number;
+  currency: string;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  method: 'mpesa' | 'card' | 'bank_transfer';
+  transactionId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  recipientId: string;
+  content: string;
+  type: 'text' | 'file' | 'image';
+  fileUrl?: string;
+  fileName?: string;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface PracticeArea {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  slug: string;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (userData: RegisterData) => Promise<void>;
+  logout: () => void;
+  loading: boolean;
+}
+
+export interface RegisterData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone?: string;
+  role: 'client' | 'advocate';
+  // Advocate-specific fields (for super admin registration)
+  licenseNumber?: string;
+  specialization?: string[];
+  experience?: number;
+  education?: string;
+  barAdmission?: string;
+}

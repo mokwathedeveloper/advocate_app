@@ -1,3 +1,4 @@
+// Footer component for LegalPro v1.0.1
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Scale, MapPin, Phone, Mail, Facebook, Twitter, Linkedin as LinkedIn, Instagram, Clock } from 'lucide-react';

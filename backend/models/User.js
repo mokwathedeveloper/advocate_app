@@ -1,3 +1,4 @@
+// User model for LegalPro v1.0.1
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 

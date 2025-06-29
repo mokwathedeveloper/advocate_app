@@ -1,3 +1,4 @@
+// TypeScript type definitions for LegalPro v1.0.1
 export interface User {
   id: string;
   email: string;

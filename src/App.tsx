@@ -9,6 +9,15 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import AdminManagement from './pages/AdminManagement';
+import PracticeAreas from './pages/PracticeAreas';
+import Contact from './pages/Contact';
+import AreasWeServe from './pages/AreasWeServe';
+import Resources from './pages/Resources';
+import Locations from './pages/Locations';
+import NotFound from './pages/NotFound';
+import Cases from './pages/Cases';
+import Appointments from './pages/Appointments';
+import Messages from './pages/Messages';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: string[] }> = ({ 
@@ -99,16 +108,46 @@ function App() {
               }
             />
 
+            {/* Public pages */}
+            <Route path="practice-areas" element={<PracticeAreas />} />
+            <Route path="resources" element={<Resources />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="areas-we-serve" element={<AreasWeServe />} />
+            <Route path="locations" element={<Locations />} />
+
+            {/* Protected routes */}
+            <Route
+              path="appointments"
+              element={
+                <ProtectedRoute>
+                  <Appointments />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="cases"
+              element={
+                <ProtectedRoute>
+                  <Cases />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="messages"
+              element={
+                <ProtectedRoute>
+                  <Messages />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Placeholder routes for future implementation */}
-            <Route path="practice-areas" element={<div className="min-h-screen flex items-center justify-center"><h1 className="text-2xl">Practice Areas - Coming Soon</h1></div>} />
-            <Route path="resources" element={<div className="min-h-screen flex items-center justify-center"><h1 className="text-2xl">Resources - Coming Soon</h1></div>} />
-            <Route path="contact" element={<div className="min-h-screen flex items-center justify-center"><h1 className="text-2xl">Contact - Coming Soon</h1></div>} />
-            <Route path="appointments" element={<div className="min-h-screen flex items-center justify-center"><h1 className="text-2xl">Appointments - Coming Soon</h1></div>} />
-            <Route path="cases" element={<div className="min-h-screen flex items-center justify-center"><h1 className="text-2xl">Cases - Coming Soon</h1></div>} />
-            <Route path="messages" element={<div className="min-h-screen flex items-center justify-center"><h1 className="text-2xl">Messages - Coming Soon</h1></div>} />
             <Route path="profile" element={<div className="min-h-screen flex items-center justify-center"><h1 className="text-2xl">Profile - Coming Soon</h1></div>} />
             <Route path="clients" element={<div className="min-h-screen flex items-center justify-center"><h1 className="text-2xl">Clients - Coming Soon</h1></div>} />
             <Route path="system-settings" element={<div className="min-h-screen flex items-center justify-center"><h1 className="text-2xl">System Settings - Coming Soon</h1></div>} />
+
+            {/* 404 Route */}
+            <Route path="*" element={<NotFound />} />
             
             {/* 404 route */}
             <Route path="*" element={<div className="min-h-screen flex items-center justify-center"><h1 className="text-2xl">Page Not Found</h1></div>} />

@@ -31,7 +31,9 @@ const Navbar: React.FC = () => {
     { path: '/', label: 'Home', icon: Home },
     { path: '/about', label: 'About', icon: User },
     { path: '/practice-areas', label: 'Practice Areas', icon: Scale },
+    { path: '/areas-we-serve', label: 'Areas We Serve', icon: null },
     { path: '/resources', label: 'Resources', icon: FileText },
+    { path: '/locations', label: 'Locations', icon: null },
     { path: '/contact', label: 'Contact', icon: MessageSquare },
   ];
 

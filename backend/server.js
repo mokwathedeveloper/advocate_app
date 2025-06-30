@@ -106,10 +106,9 @@ if (process.env.NODE_ENV === 'development') {
 
 const { sendEmail, sendSMS } = require('./utils/notificationService');
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/advocate_app', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+// Connect to MongoDB Atlas
+mongoose.connect(process.env.MONGODB_URI, {
+  // Remove deprecated options
 })
 .then(async () => {
   console.log('MongoDB connected');

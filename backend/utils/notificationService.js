@@ -1,3 +1,4 @@
+// Notification service for LegalPro v1.0.1
 const nodemailer = require('nodemailer');
 const twilio = require('twilio');
 require('dotenv').config();

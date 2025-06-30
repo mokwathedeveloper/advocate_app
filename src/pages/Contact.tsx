@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Send, MessageSquare } from 'lucide-react';
 import GoogleMapWrapper from '../components/maps/GoogleMapWrapper';
+import { WhatsAppChatButton, WhatsAppContactButton, WhatsAppConsultationButton } from '../components/whatsapp/WhatsAppButton';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -55,8 +56,15 @@ const Contact: React.FC = () => {
     {
       icon: Phone,
       title: 'Phone',
-      details: ['+254 700 123 456', '+254 700 123 457'],
-      action: 'tel:+254700123456'
+      details: ['+254 726 745 739', '+254 700 123 457'],
+      action: 'tel:+254726745739'
+    },
+    {
+      icon: MessageSquare,
+      title: 'WhatsApp',
+      details: ['+254 726 745 739', 'Chat with us instantly', 'Available 24/7'],
+      action: 'whatsapp',
+      isWhatsApp: true
     },
     {
       icon: Mail,
@@ -127,12 +135,21 @@ const Contact: React.FC = () => {
                   </div>
                   {info.action !== '#' && (
                     <div className="mt-4">
-                      <a
-                        href={info.action}
-                        className="text-navy-600 hover:text-navy-800 text-sm font-medium"
-                      >
-                        {info.title === 'Phone' ? 'Call Now' : 'Send Email'}
-                      </a>
+                      {info.isWhatsApp ? (
+                        <WhatsAppChatButton
+                          size="sm"
+                          message="Hi! I found your contact information and would like to chat about legal services."
+                        >
+                          Chat Now
+                        </WhatsAppChatButton>
+                      ) : (
+                        <a
+                          href={info.action}
+                          className="text-navy-600 hover:text-navy-800 text-sm font-medium"
+                        >
+                          {info.title === 'Phone' ? 'Call Now' : 'Send Email'}
+                        </a>
+                      )}
                     </div>
                   )}
                 </Card>
@@ -287,7 +304,7 @@ const Contact: React.FC = () => {
                     </p>
                   </div>
 
-                  <div className="flex space-x-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Button
                       variant="outline"
                       size="sm"
@@ -298,10 +315,17 @@ const Contact: React.FC = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => window.open('tel:+254700123456')}
+                      onClick={() => window.open('tel:+254726745739')}
                     >
                       Call Office
                     </Button>
+                    <div className="sm:col-span-2">
+                      <WhatsAppContactButton
+                        size="sm"
+                        className="w-full"
+                        message="Hi! I found your contact information and would like to get in touch regarding legal services."
+                      />
+                    </div>
                   </div>
                 </div>
               </Card>

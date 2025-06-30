@@ -1,24 +1,23 @@
 // Navigation bar component for LegalPro v1.0.1
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-// Temporarily removed lucide-react imports to fix null component error
-// import {
-//   Scale,
-//   Menu,
-//   X,
-//   User,
-//   LogOut,
-//   Settings,
-//   Home,
-//   Calendar,
-//   MessageSquare,
-//   FileText,
-//   Users,
-//   Shield
-// } from 'lucide-react';
+import {
+  Scale,
+  Menu,
+  X,
+  User,
+  LogOut,
+  Settings,
+  Home,
+  Calendar,
+  MessageSquare,
+  FileText,
+  Users,
+  Shield
+} from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-// import NotificationCenter from '../notifications/NotificationCenter';
+import NotificationCenter from '../notifications/NotificationCenter';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,28 +29,28 @@ const Navbar: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const publicNavItems = [
-    { path: '/', label: 'Home', icon: null },
-    { path: '/about', label: 'About', icon: null },
-    { path: '/practice-areas', label: 'Practice Areas', icon: null },
+    { path: '/', label: 'Home', icon: Home },
+    { path: '/about', label: 'About', icon: User },
+    { path: '/practice-areas', label: 'Practice Areas', icon: Scale },
     { path: '/areas-we-serve', label: 'Areas We Serve', icon: null },
-    { path: '/resources', label: 'Resources', icon: null },
+    { path: '/resources', label: 'Resources', icon: FileText },
     { path: '/locations', label: 'Locations', icon: null },
-    { path: '/contact', label: 'Contact', icon: null },
+    { path: '/contact', label: 'Contact', icon: MessageSquare },
   ];
 
   const clientNavItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: null },
-    { path: '/cases', label: 'My Cases', icon: null },
-    { path: '/appointments', label: 'Appointments', icon: null },
-    { path: '/messages', label: 'Messages', icon: null },
+    { path: '/dashboard', label: 'Dashboard', icon: Home },
+    { path: '/cases', label: 'My Cases', icon: FileText },
+    { path: '/appointments', label: 'Appointments', icon: Calendar },
+    { path: '/messages', label: 'Messages', icon: MessageSquare },
   ];
 
   const adminNavItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: null },
-    { path: '/cases', label: 'Cases', icon: null },
-    { path: '/appointments', label: 'Appointments', icon: null },
-    { path: '/messages', label: 'Messages', icon: null },
-    { path: '/clients', label: 'Clients', icon: null },
+    { path: '/dashboard', label: 'Dashboard', icon: Home },
+    { path: '/cases', label: 'Cases', icon: FileText },
+    { path: '/appointments', label: 'Appointments', icon: Calendar },
+    { path: '/messages', label: 'Messages', icon: MessageSquare },
+    { path: '/clients', label: 'Clients', icon: Users },
   ];
 
   const advocateNavItems = [
@@ -107,7 +106,7 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <span className="text-2xl">⚖️</span>
+              <Scale className="h-8 w-8 text-navy-800" />
               <span className="text-xl font-bold text-navy-800">
                 LegalPro
               </span>
@@ -136,7 +135,7 @@ const Navbar: React.FC = () => {
               {user ? (
                 <>
                   {/* Notification Center */}
-                  {/* <NotificationCenter /> */}
+                  <NotificationCenter />
 
                   <div className="relative">
                   <button
@@ -147,9 +146,9 @@ const Navbar: React.FC = () => {
                       user.role === 'advocate' ? 'bg-gold-100' : 'bg-navy-100'
                     }`}>
                       {user.role === 'advocate' ? (
-                        <span className="text-xs font-bold text-gold-600">⚖</span>
+                        <Scale className="h-4 w-4 text-gold-600" />
                       ) : (
-                        <span className="text-xs font-bold text-navy-800">👤</span>
+                        <User className="h-4 w-4 text-navy-800" />
                       )}
                     </div>
                     <div className="text-left">
@@ -175,7 +174,7 @@ const Navbar: React.FC = () => {
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
-                          <span className="mr-2">⚙️</span>
+                          <Settings className="h-4 w-4 mr-2" />
                           Profile Settings
                         </Link>
                         {user.role === 'advocate' && (
@@ -184,7 +183,7 @@ const Navbar: React.FC = () => {
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                             onClick={() => setIsUserMenuOpen(false)}
                           >
-                            <span className="mr-2">🛡️</span>
+                            <Shield className="h-4 w-4 mr-2" />
                             Admin Management
                           </Link>
                         )}
@@ -192,7 +191,7 @@ const Navbar: React.FC = () => {
                           onClick={handleLogout}
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
-                          <span className="mr-2">🚪</span>
+                          <LogOut className="h-4 w-4 mr-2" />
                           Sign Out
                         </button>
                       </motion.div>
@@ -226,9 +225,9 @@ const Navbar: React.FC = () => {
               className="text-gray-700 hover:text-navy-800 focus:outline-none"
             >
               {isMenuOpen ? (
-                <span className="text-xl">✕</span>
+                <X className="h-6 w-6" />
               ) : (
-                <span className="text-xl">☰</span>
+                <Menu className="h-6 w-6" />
               )}
             </button>
           </div>
@@ -272,7 +271,7 @@ const Navbar: React.FC = () => {
                     className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <span>⚙️</span>
+                    <Settings className="h-5 w-5" />
                     <span>Profile Settings</span>
                   </Link>
                   {user.role === 'advocate' && (
@@ -281,7 +280,7 @@ const Navbar: React.FC = () => {
                       className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <span>🛡️</span>
+                      <Shield className="h-5 w-5" />
                       <span>Admin Management</span>
                     </Link>
                   )}
@@ -292,7 +291,7 @@ const Navbar: React.FC = () => {
                     }}
                     className="flex items-center space-x-2 w-full px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
                   >
-                    <span>🚪</span>
+                    <LogOut className="h-5 w-5" />
                     <span>Sign Out</span>
                   </button>
                 </div>

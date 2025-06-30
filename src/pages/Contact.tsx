@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Send, MessageSquare } from 'lucide-react';
+import GoogleMapWrapper from '../components/maps/GoogleMapWrapper';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -255,13 +256,25 @@ const Contact: React.FC = () => {
                   Find Our Office
                 </h2>
 
-                {/* Map Placeholder */}
-                <div className="bg-gray-200 rounded-lg h-64 flex items-center justify-center mb-6">
-                  <div className="text-center">
-                    <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500">Interactive Map Coming Soon</p>
-                    <p className="text-sm text-gray-400">Google Maps Integration</p>
-                  </div>
+                {/* Interactive Google Map */}
+                <div className="mb-6">
+                  <GoogleMapWrapper
+                    center={{ lat: -1.2921, lng: 36.8219 }}
+                    zoom={15}
+                    markers={[
+                      {
+                        id: 'main-office',
+                        position: { lat: -1.2921, lng: 36.8219 },
+                        title: 'LegalPro Main Office',
+                        address: 'LegalPro Chambers, 5th Floor, Utalii House, Uhuru Highway, Nairobi, Kenya',
+                        phone: '+254 700 123 456',
+                        hours: 'Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 2:00 PM\nSunday: Closed',
+                        services: ['General Legal Consultation', 'Corporate Law', 'Family Law', 'Property Law']
+                      }
+                    ]}
+                    height="300px"
+                    className="rounded-lg overflow-hidden"
+                  />
                 </div>
 
                 <div className="space-y-4">

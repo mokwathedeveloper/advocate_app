@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import Card from '../components/ui/Card';
+import GoogleMapWrapper from '../components/maps/GoogleMapWrapper';
 
 const AreasWeServe: React.FC = () => {
   const counties = [
@@ -225,27 +226,60 @@ const AreasWeServe: React.FC = () => {
             </p>
           </motion.div>
           
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <MapPin className="w-16 h-16 text-navy-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-navy-800 mb-2">
-              Google Maps Integration
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Interactive maps with directions to all our office locations will be available soon.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="tel:+254700123456"
-                className="bg-navy-800 text-white px-6 py-3 rounded-lg hover:bg-navy-700 transition-colors"
-              >
-                Call for Directions
-              </a>
-              <a
-                href="/contact"
-                className="border border-navy-800 text-navy-800 px-6 py-3 rounded-lg hover:bg-navy-50 transition-colors"
-              >
-                Contact Us
-              </a>
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <GoogleMapWrapper
+              center={{ lat: -1.2921, lng: 36.8219 }}
+              zoom={8}
+              markers={[
+                {
+                  id: 'nairobi-office',
+                  position: { lat: -1.2921, lng: 36.8219 },
+                  title: 'LegalPro Main Office - Nairobi CBD',
+                  address: 'LegalPro Chambers, 5th Floor, Utalii House, Uhuru Highway, Nairobi CBD',
+                  phone: '+254 700 123 456',
+                  services: ['General Legal Consultation', 'Corporate Law', 'Family Law', 'Property Law']
+                },
+                {
+                  id: 'thika-office',
+                  position: { lat: -1.0332, lng: 37.0692 },
+                  title: 'LegalPro Thika Branch Office',
+                  address: 'Thika Business Centre, 2nd Floor, Commercial Street, Thika Town',
+                  phone: '+254 700 123 457',
+                  services: ['Family Law', 'Employment Law', 'Criminal Defense', 'Property Disputes']
+                },
+                {
+                  id: 'machakos-office',
+                  position: { lat: -1.5177, lng: 37.2634 },
+                  title: 'LegalPro Machakos Branch Office',
+                  address: 'Machakos Law Courts Complex, Ground Floor, Court Road, Machakos',
+                  phone: '+254 700 123 458',
+                  services: ['Criminal Defense', 'Civil Litigation', 'Land Law', 'Succession']
+                }
+              ]}
+              height="400px"
+            />
+
+            <div className="p-6 text-center">
+              <h3 className="text-xl font-semibold text-navy-800 mb-2">
+                Interactive Office Locations
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Click on any marker to view office details and get directions.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="/locations"
+                  className="bg-navy-800 text-white px-6 py-3 rounded-lg hover:bg-navy-700 transition-colors"
+                >
+                  View All Locations
+                </a>
+                <a
+                  href="/contact"
+                  className="border border-navy-800 text-navy-800 px-6 py-3 rounded-lg hover:bg-navy-50 transition-colors"
+                >
+                  Contact Us
+                </a>
+              </div>
             </div>
           </div>
         </div>

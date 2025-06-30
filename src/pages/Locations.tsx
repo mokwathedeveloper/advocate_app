@@ -1,12 +1,16 @@
-// Locations page for LegalPro v1.0.1
-import React from 'react';
+// Locations page for LegalPro v1.0.1 - Enhanced with Google Maps Integration
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, Navigation, Car, Bus } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Navigation, Car, Bus, Map } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import OfficeLocationsMap, { Office } from '../components/maps/OfficeLocationsMap';
 
 const Locations: React.FC = () => {
-  const offices = [
+  const [selectedOffice, setSelectedOffice] = useState<Office | null>(null);
+  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+
+  const offices: Office[] = [
     {
       id: 1,
       name: 'Main Office - Nairobi CBD',
@@ -91,11 +95,74 @@ const Locations: React.FC = () => {
         </div>
       </section>
 
-      {/* Offices Section */}
-      <section className="py-16">
+      {/* View Mode Toggle */}
+      <section className="py-8 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-12">
-            {offices.map((office, index) => (
+          <div className="flex justify-center">
+            <div className="bg-gray-100 p-1 rounded-lg">
+              <button
+                onClick={() => setViewMode('map')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'map'
+                    ? 'bg-navy-800 text-white'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <Map className="w-4 h-4 inline-block mr-2" />
+                Map View
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-navy-800 text-white'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <MapPin className="w-4 h-4 inline-block mr-2" />
+                List View
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Map Section */}
+      {viewMode === 'map' && (
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-navy-800 mb-4">
+                  Find Our Offices
+                </h2>
+                <p className="text-gray-600 max-w-2xl mx-auto">
+                  Click on any office marker to view details, get directions, or contact the office directly.
+                </p>
+              </div>
+
+              <OfficeLocationsMap
+                offices={offices}
+                selectedOfficeId={selectedOffice?.id}
+                onOfficeSelect={setSelectedOffice}
+                height="600px"
+                showOfficeList={true}
+              />
+            </motion.div>
+          </div>
+        </section>
+      )}
+
+      {/* Traditional List View */}
+      {viewMode === 'list' && (
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="space-y-12">
+              {offices.map((office, index) => (
               <motion.div
                 key={office.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -238,10 +305,11 @@ const Locations: React.FC = () => {
                   </div>
                 </Card>
               </motion.div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Contact CTA */}
       <section className="py-16 bg-navy-800 text-white">

@@ -1,23 +1,24 @@
 // Navigation bar component for LegalPro v1.0.1
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Scale, 
-  Menu, 
-  X, 
-  User, 
-  LogOut, 
-  Settings,
-  Home,
-  Calendar,
-  MessageSquare,
-  FileText,
-  Users,
-  Shield
-} from 'lucide-react';
+// Temporarily removed lucide-react imports to fix null component error
+// import {
+//   Scale,
+//   Menu,
+//   X,
+//   User,
+//   LogOut,
+//   Settings,
+//   Home,
+//   Calendar,
+//   MessageSquare,
+//   FileText,
+//   Users,
+//   Shield
+// } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import NotificationCenter from '../notifications/NotificationCenter';
+// import NotificationCenter from '../notifications/NotificationCenter';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -106,7 +107,7 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <Scale className="h-8 w-8 text-navy-800" />
+              <span className="text-2xl">⚖️</span>
               <span className="text-xl font-bold text-navy-800">
                 LegalPro
               </span>
@@ -135,7 +136,7 @@ const Navbar: React.FC = () => {
               {user ? (
                 <>
                   {/* Notification Center */}
-                  <NotificationCenter />
+                  {/* <NotificationCenter /> */}
 
                   <div className="relative">
                   <button
@@ -146,9 +147,9 @@ const Navbar: React.FC = () => {
                       user.role === 'advocate' ? 'bg-gold-100' : 'bg-navy-100'
                     }`}>
                       {user.role === 'advocate' ? (
-                        <Scale className="h-4 w-4 text-gold-600" />
+                        <span className="text-xs font-bold text-gold-600">⚖</span>
                       ) : (
-                        <User className="h-4 w-4 text-navy-800" />
+                        <span className="text-xs font-bold text-navy-800">👤</span>
                       )}
                     </div>
                     <div className="text-left">
@@ -174,7 +175,7 @@ const Navbar: React.FC = () => {
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
-                          <Settings className="h-4 w-4 mr-2" />
+                          <span className="mr-2">⚙️</span>
                           Profile Settings
                         </Link>
                         {user.role === 'advocate' && (
@@ -183,7 +184,7 @@ const Navbar: React.FC = () => {
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                             onClick={() => setIsUserMenuOpen(false)}
                           >
-                            <Shield className="h-4 w-4 mr-2" />
+                            <span className="mr-2">🛡️</span>
                             Admin Management
                           </Link>
                         )}
@@ -191,7 +192,7 @@ const Navbar: React.FC = () => {
                           onClick={handleLogout}
                           className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
-                          <LogOut className="h-4 w-4 mr-2" />
+                          <span className="mr-2">🚪</span>
                           Sign Out
                         </button>
                       </motion.div>
@@ -225,9 +226,9 @@ const Navbar: React.FC = () => {
               className="text-gray-700 hover:text-navy-800 focus:outline-none"
             >
               {isMenuOpen ? (
-                <X className="h-6 w-6" />
+                <span className="text-xl">✕</span>
               ) : (
-                <Menu className="h-6 w-6" />
+                <span className="text-xl">☰</span>
               )}
             </button>
           </div>
@@ -271,7 +272,7 @@ const Navbar: React.FC = () => {
                     className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Settings className="h-5 w-5" />
+                    <span>⚙️</span>
                     <span>Profile Settings</span>
                   </Link>
                   {user.role === 'advocate' && (
@@ -280,7 +281,7 @@ const Navbar: React.FC = () => {
                       className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <Shield className="h-5 w-5" />
+                      <span>🛡️</span>
                       <span>Admin Management</span>
                     </Link>
                   )}
@@ -291,7 +292,7 @@ const Navbar: React.FC = () => {
                     }}
                     className="flex items-center space-x-2 w-full px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
                   >
-                    <LogOut className="h-5 w-5" />
+                    <span>🚪</span>
                     <span>Sign Out</span>
                   </button>
                 </div>

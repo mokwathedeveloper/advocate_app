@@ -29,6 +29,9 @@ const createTokenResponse = (user, statusCode, res) => {
 // @access  Public
 const register = async (req, res) => {
   try {
+    console.log('Registration request received:', req.body);
+
+    // Validate required fields
     const {
       firstName,
       lastName,
@@ -42,6 +45,14 @@ const register = async (req, res) => {
       education,
       barAdmission
     } = req.body;
+
+    // Basic validation
+    if (!firstName || !lastName || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide firstName, lastName, email, and password'
+      });
+    }
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -72,14 +83,36 @@ const register = async (req, res) => {
       userData.isVerified = false; // Advocates need manual verification
     }
 
+    console.log('Creating user with data:', userData);
     const user = await User.create(userData);
+    console.log('User created successfully:', user._id);
 
     createTokenResponse(user, 201, res);
   } catch (error) {
     console.error('Register error:', error);
+
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        errors: messages
+      });
+    }
+
+    // Handle duplicate key error
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email already exists'
+      });
+    }
+
     res.status(500).json({
       success: false,
-      message: 'Server error during registration'
+      message: 'Server error during registration',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

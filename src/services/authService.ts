@@ -17,6 +17,15 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Add response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const message = error.response?.data?.message || error.message || 'An error occurred';
+    throw new Error(message);
+  }
+);
+
 export const authService = {
   async login(email: string, password: string) {
     const response = await api.post('/auth/login', { email, password });

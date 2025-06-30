@@ -10,7 +10,7 @@ const morgan = require('morgan');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
-require('dotenv').config();
+
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -107,34 +107,36 @@ if (process.env.NODE_ENV === 'development') {
 const { sendEmail, sendSMS } = require('./utils/notificationService');
 
 // Connect to MongoDB Atlas
-mongoose.connect(process.env.MONGODB_URI, {
-  // Remove deprecated options
-})
-.then(async () => {
-  console.log('MongoDB connected');
+if (process.env.NODE_ENV !== 'test') {
+  mongoose.connect(process.env.MONGODB_URI, {
+    // Remove deprecated options
+  })
+  .then(async () => {
+    console.log('MongoDB connected');
 
-  // Send notification on successful connection
-  try {
-    const message = 'MongoDB connection established successfully for Advocate backend.';
-    console.log('Sending notification:', message);
+    // Send notification on successful connection
+    try {
+      const message = 'MongoDB connection established successfully for Advocate backend.';
+      console.log('Sending notification:', message);
 
-    // Send email notification (configure environment variables accordingly)
-    await sendEmail(
-      process.env.NOTIFY_EMAIL || 'admin@example.com',
-      'MongoDB Connection Success',
-      message,
-      `<p>${message}</p>`
-    );
+      // Send email notification (configure environment variables accordingly)
+      await sendEmail(
+        process.env.NOTIFY_EMAIL || 'admin@example.com',
+        'MongoDB Connection Success',
+        message,
+        `<p>${message}</p>`
+      );
 
-    // Send SMS notification (configure environment variables accordingly)
-    if (process.env.NOTIFY_PHONE) {
-      await sendSMS(process.env.NOTIFY_PHONE, message);
+      // Send SMS notification (configure environment variables accordingly)
+      if (process.env.NOTIFY_PHONE) {
+        await sendSMS(process.env.NOTIFY_PHONE, message);
+      }
+    } catch (notificationError) {
+      console.error('Notification error:', notificationError);
     }
-  } catch (notificationError) {
-    console.error('Notification error:', notificationError);
-  }
-})
-.catch(err => console.error('MongoDB connection error:', err));
+  })
+  .catch(err => console.error('MongoDB connection error:', err));
+}
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -173,8 +175,10 @@ socketHandler(io);
 
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(PORT, () => {
+    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+  });
+}
 
-module.exports = app;
+module.exports = server;

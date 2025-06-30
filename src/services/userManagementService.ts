@@ -68,6 +68,12 @@ export interface CreateUserResponse {
 }
 
 export const userManagementService = {
+  // Create advocate user (for invitation system)
+  async createAdvocate(advocateData: any): Promise<CreateUserResponse> {
+    const response = await api.post('/user-management/create-advocate', advocateData);
+    return response.data;
+  },
+
   // Create admin user (Advocate only)
   async createAdmin(adminData: CreateAdminData): Promise<CreateUserResponse> {
     const response = await api.post('/user-management/create-admin', adminData);

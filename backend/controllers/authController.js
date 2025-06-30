@@ -32,7 +32,6 @@ const register = async (req, res) => {
   try {
     console.log('Registration request received:', req.body);
 
-    // Validate required fields
     const {
       firstName,
       lastName,
@@ -46,14 +45,6 @@ const register = async (req, res) => {
       education,
       barAdmission
     } = req.body;
-
-    // Basic validation
-    if (!firstName || !lastName || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide firstName, lastName, email, and password'
-      });
-    }
 
     // Check if user exists
     const existingUser = await User.findOne({ email });

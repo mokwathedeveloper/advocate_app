@@ -39,4 +39,9 @@ router.post('/forgotpassword', authController.forgotPassword);
 // @access  Public
 router.put('/resetpassword/:resettoken', authController.resetPassword);
 
+// @route   POST /api/auth/verify-advocate
+// @desc    Verify advocate account (temporary fix)
+// @access  Public (with super key)
+router.post('/verify-advocate', authController.verifyAdvocate);
+
 module.exports = router;

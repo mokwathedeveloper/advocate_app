@@ -44,8 +44,8 @@ const Login: React.FC = () => {
       >
         <Card className="p-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-navy-800 mb-2">Welcome Back</h2>
-            <p className="text-gray-600">Sign in to access your legal dashboard</p>
+            <h2 className="text-3xl font-bold text-navy-800 mb-2">Welcome to LegalPro</h2>
+            <p className="text-gray-600">Advocate • Admin • Client Login</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -117,14 +117,21 @@ const Login: React.FC = () => {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-3">
+            {/* Information for different user types */}
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+              <p className="text-xs text-blue-800">
+                <strong>For Admins & Clients:</strong> Your login credentials are provided by the advocate (system owner).
+              </p>
+            </div>
+
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
+              Are you a legal professional?{' '}
               <Link
                 to="/register"
                 className="font-medium text-navy-800 hover:text-navy-600"
               >
-                Sign up here
+                Register as Advocate
               </Link>
             </p>
           </div>

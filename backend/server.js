@@ -33,15 +33,33 @@ const server = http.createServer(app);
 
 // Security middleware
 app.use(helmet());
+// CORS configuration - more permissive for development
 app.use(cors({
-  origin: [
-    process.env.CLIENT_URL || 'http://localhost:5173',
-    'http://localhost:3000',
-    'http://127.0.0.1:5173'
-  ],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://127.0.0.1:5173',
+      'http://localhost:5174',
+      process.env.CLIENT_URL
+    ];
+
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+  preflightContinue: false,
+  optionsSuccessStatus: 200
 }));
 
 // Rate limiting
@@ -66,6 +84,14 @@ app.use(compression());
 // Logging middleware
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
+
+  // Debug middleware for CORS issues
+  app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    console.log('Origin:', req.headers.origin);
+    console.log('User-Agent:', req.headers['user-agent']);
+    next();
+  });
 }
 
 const { sendEmail, sendSMS } = require('./utils/notificationService');

@@ -17,7 +17,7 @@ interface RegisterFormData extends RegisterData {
 const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<'client' | 'advocate'>('client');
+  const [selectedRole, setSelectedRole] = useState<'advocate'>('advocate');
   const { register: registerUser, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -46,7 +46,7 @@ const Register: React.FC = () => {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       const { confirmPassword, ...userData } = data;
-      userData.role = selectedRole;
+      userData.role = 'advocate'; // Only advocates can register directly
       await registerUser(userData);
       navigate('/dashboard');
     } catch (error) {
@@ -71,44 +71,27 @@ const Register: React.FC = () => {
           {/* Role Selection */}
           <div className="mb-8">
             <h3 className="text-lg font-medium text-navy-800 mb-4">I am registering as:</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="text-center">
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
-                  selectedRole === 'client'
-                    ? 'border-navy-800 bg-navy-50'
-                    : 'border-gray-300 hover:border-gray-400'
-                }`}
-                onClick={() => setSelectedRole('client')}
+                className="p-6 border-2 border-navy-800 bg-navy-50 rounded-lg"
               >
-                <div className="flex items-center space-x-3">
-                  <User className="w-8 h-8 text-navy-800" />
+                <div className="flex items-center justify-center space-x-3">
+                  <Scale className="w-8 h-8 text-navy-800" />
                   <div>
-                    <h4 className="font-semibold text-navy-800">Client</h4>
-                    <p className="text-sm text-gray-600">Seeking legal services</p>
+                    <h4 className="font-semibold text-navy-800">Advocate Registration</h4>
+                    <p className="text-sm text-gray-600">Legal professional (Superuser/Owner)</p>
                   </div>
                 </div>
               </motion.div>
 
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
-                  selectedRole === 'advocate'
-                    ? 'border-navy-800 bg-navy-50'
-                    : 'border-gray-300 hover:border-gray-400'
-                }`}
-                onClick={() => setSelectedRole('advocate')}
-              >
-                <div className="flex items-center space-x-3">
-                  <Scale className="w-8 h-8 text-navy-800" />
-                  <div>
-                    <h4 className="font-semibold text-navy-800">Advocate</h4>
-                    <p className="text-sm text-gray-600">Legal professional (Super Admin)</p>
-                  </div>
-                </div>
-              </motion.div>
+              <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+                <p className="text-sm text-amber-800">
+                  <strong>Note:</strong> Only advocates can register directly.
+                  Advocates will create admin and client accounts through the system.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -163,7 +146,8 @@ const Register: React.FC = () => {
             />
 
             {/* Advocate-specific fields */}
-            {selectedRole === 'advocate' && (
+            <div className="space-y-6 border-t pt-6">
+              <h3 className="text-lg font-medium text-navy-800 mb-4">Professional Information</h3>
               <div className="space-y-6 border-t pt-6">
                 <h3 className="text-lg font-medium text-navy-800 mb-4">Professional Information</h3>
                 
@@ -173,7 +157,7 @@ const Register: React.FC = () => {
                     icon={<Award className="w-5 h-5 text-gray-400" />}
                     error={errors.licenseNumber?.message}
                     {...register('licenseNumber', {
-                      required: selectedRole === 'advocate' ? 'License number is required' : false
+                      required: 'License number is required'
                     })}
                   />
 
@@ -184,7 +168,7 @@ const Register: React.FC = () => {
                     icon={<GraduationCap className="w-5 h-5 text-gray-400" />}
                     error={errors.experience?.message}
                     {...register('experience', {
-                      required: selectedRole === 'advocate' ? 'Experience is required' : false,
+                      required: 'Experience is required',
                       min: { value: 0, message: 'Experience cannot be negative' }
                     })}
                   />
@@ -196,7 +180,7 @@ const Register: React.FC = () => {
                   icon={<GraduationCap className="w-5 h-5 text-gray-400" />}
                   error={errors.education?.message}
                   {...register('education', {
-                    required: selectedRole === 'advocate' ? 'Education background is required' : false
+                    required: 'Education background is required'
                   })}
                 />
 
@@ -206,7 +190,7 @@ const Register: React.FC = () => {
                   icon={<FileText className="w-5 h-5 text-gray-400" />}
                   error={errors.barAdmission?.message}
                   {...register('barAdmission', {
-                    required: selectedRole === 'advocate' ? 'Bar admission details are required' : false
+                    required: 'Bar admission details are required'
                   })}
                 />
 
@@ -229,7 +213,7 @@ const Register: React.FC = () => {
                   </div>
                 </div>
               </div>
-            )}
+            </div>
 
             {/* Password fields */}
             <div className="space-y-4 border-t pt-6">
@@ -298,11 +282,9 @@ const Register: React.FC = () => {
                 <Link to="/privacy" className="text-navy-800 hover:text-navy-600">
                   Privacy Policy
                 </Link>
-                {selectedRole === 'advocate' && (
-                  <span className="block text-xs text-gray-500 mt-1">
-                    * Advocate accounts require verification before activation
-                  </span>
-                )}
+                <span className="block text-xs text-gray-500 mt-1">
+                  * Advocate accounts require verification before activation
+                </span>
               </label>
             </div>
             {errors.terms && (
@@ -315,11 +297,11 @@ const Register: React.FC = () => {
               loading={loading}
               disabled={loading}
             >
-              {selectedRole === 'advocate' ? 'Register as Advocate (Super Admin)' : 'Create Account'}
+              Register as Advocate (Superuser/Owner)
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
               <Link
@@ -327,6 +309,12 @@ const Register: React.FC = () => {
                 className="font-medium text-navy-800 hover:text-navy-600"
               >
                 Sign in here
+              </Link>
+            </p>
+            <p className="text-xs text-gray-500">
+              Are you a legal professional?{' '}
+              <Link to="/advocate-register" className="font-medium text-gold-600 hover:text-gold-500">
+                Register as Advocate (Superuser)
               </Link>
             </p>
           </div>

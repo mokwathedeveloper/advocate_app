@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import NotificationCenter from '../notifications/NotificationCenter';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -132,7 +133,11 @@ const Navbar: React.FC = () => {
             {/* User Menu or Auth Buttons */}
             <div className="flex items-center space-x-4">
               {user ? (
-                <div className="relative">
+                <>
+                  {/* Notification Center */}
+                  <NotificationCenter />
+
+                  <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     className="flex items-center space-x-2 text-gray-700 hover:text-navy-800 focus:outline-none"
@@ -193,6 +198,7 @@ const Navbar: React.FC = () => {
                     )}
                   </AnimatePresence>
                 </div>
+                </>
               ) : (
                 <div className="flex items-center space-x-2">
                   <Link

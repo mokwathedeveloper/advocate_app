@@ -62,7 +62,156 @@ async function sendSMS(to, body) {
   }
 }
 
+// Email templates
+const emailTemplates = {
+  welcome: (name) => ({
+    subject: 'Welcome to LegalPro - Your Legal Journey Begins',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1e3a8a;">Welcome to LegalPro, ${name}!</h2>
+        <p>Thank you for registering with LegalPro. We're excited to help you with your legal needs.</p>
+        <p>You can now:</p>
+        <ul>
+          <li>Book appointments with our experienced advocates</li>
+          <li>Track your cases in real-time</li>
+          <li>Upload and manage documents securely</li>
+          <li>Communicate directly with your legal team</li>
+        </ul>
+        <p>If you have any questions, don't hesitate to contact us.</p>
+        <p>Best regards,<br>The LegalPro Team</p>
+      </div>
+    `
+  }),
+
+  appointmentConfirmation: (name, date, time, advocate) => ({
+    subject: 'Appointment Confirmation - LegalPro',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1e3a8a;">Appointment Confirmed</h2>
+        <p>Dear ${name},</p>
+        <p>Your appointment has been confirmed with the following details:</p>
+        <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <p><strong>Date:</strong> ${date}</p>
+          <p><strong>Time:</strong> ${time}</p>
+          <p><strong>Advocate:</strong> ${advocate}</p>
+        </div>
+        <p>Please arrive 10 minutes early and bring any relevant documents.</p>
+        <p>Best regards,<br>The LegalPro Team</p>
+      </div>
+    `
+  }),
+
+  caseUpdate: (name, caseTitle, status, notes) => ({
+    subject: `Case Update: ${caseTitle} - LegalPro`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1e3a8a;">Case Update</h2>
+        <p>Dear ${name},</p>
+        <p>There's an update on your case: <strong>${caseTitle}</strong></p>
+        <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <p><strong>New Status:</strong> ${status}</p>
+          ${notes ? `<p><strong>Notes:</strong> ${notes}</p>` : ''}
+        </div>
+        <p>You can view more details by logging into your dashboard.</p>
+        <p>Best regards,<br>The LegalPro Team</p>
+      </div>
+    `
+  }),
+
+  paymentConfirmation: (name, amount, transactionId, service) => ({
+    subject: 'Payment Confirmation - LegalPro',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #059669;">Payment Confirmed</h2>
+        <p>Dear ${name},</p>
+        <p>Your payment has been successfully processed:</p>
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <p><strong>Amount:</strong> KES ${amount}</p>
+          <p><strong>Service:</strong> ${service}</p>
+          <p><strong>Transaction ID:</strong> ${transactionId}</p>
+        </div>
+        <p>Thank you for your payment. A receipt has been generated for your records.</p>
+        <p>Best regards,<br>The LegalPro Team</p>
+      </div>
+    `
+  })
+};
+
+// SMS templates
+const smsTemplates = {
+  appointmentReminder: (name, date, time) =>
+    `Hi ${name}, reminder: You have an appointment tomorrow at ${time} on ${date}. Please arrive 10 minutes early. - LegalPro`,
+
+  caseUpdate: (name, caseTitle, status) =>
+    `Hi ${name}, update on ${caseTitle}: Status changed to ${status}. Check your dashboard for details. - LegalPro`,
+
+  paymentConfirmation: (name, amount) =>
+    `Hi ${name}, payment of KES ${amount} confirmed. Thank you! - LegalPro`
+};
+
+// Send templated email
+async function sendTemplatedEmail(to, templateName, data) {
+  try {
+    const template = emailTemplates[templateName];
+    if (!template) {
+      throw new Error(`Email template '${templateName}' not found`);
+    }
+
+    const { subject, html } = template(data.name, ...Object.values(data).slice(1));
+    return await sendEmail(to, subject, '', html);
+  } catch (error) {
+    console.error('Error sending templated email:', error);
+    throw error;
+  }
+}
+
+// Send templated SMS
+async function sendTemplatedSMS(to, templateName, data) {
+  try {
+    const template = smsTemplates[templateName];
+    if (!template) {
+      throw new Error(`SMS template '${templateName}' not found`);
+    }
+
+    const message = template(data.name, ...Object.values(data).slice(1));
+    return await sendSMS(to, message);
+  } catch (error) {
+    console.error('Error sending templated SMS:', error);
+    throw error;
+  }
+}
+
+// Send notification (email + SMS)
+async function sendNotification(user, type, data) {
+  const results = {};
+
+  // Send email
+  if (user.email) {
+    try {
+      results.email = await sendTemplatedEmail(user.email, type, { name: user.firstName, ...data });
+    } catch (error) {
+      results.email = { error: error.message };
+    }
+  }
+
+  // Send SMS
+  if (user.phone) {
+    try {
+      results.sms = await sendTemplatedSMS(user.phone, type, { name: user.firstName, ...data });
+    } catch (error) {
+      results.sms = { error: error.message };
+    }
+  }
+
+  return results;
+}
+
 module.exports = {
   sendEmail,
   sendSMS,
+  sendTemplatedEmail,
+  sendTemplatedSMS,
+  sendNotification,
+  emailTemplates,
+  smsTemplates
 };

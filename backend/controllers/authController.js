@@ -2,6 +2,7 @@
 const crypto = require('crypto');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { sendNotification } = require('../utils/notificationService');
 
 // Generate JWT
 const signToken = (id) => {
@@ -86,6 +87,11 @@ const register = async (req, res) => {
     console.log('Creating user with data:', userData);
     const user = await User.create(userData);
     console.log('User created successfully:', user._id);
+
+    // Send welcome notification (don't wait for it to complete)
+    sendNotification(user, 'welcome', {})
+      .then(result => console.log('Welcome notification sent:', result))
+      .catch(error => console.error('Welcome notification failed:', error));
 
     createTokenResponse(user, 201, res);
   } catch (error) {

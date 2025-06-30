@@ -1,3 +1,4 @@
+// File upload middleware for LegalPro v1.0.1
 const multer = require('multer');
 const path = require('path');
 

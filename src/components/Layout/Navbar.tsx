@@ -30,28 +30,28 @@ const Navbar: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const publicNavItems = [
-    { path: '/', label: 'Home', icon: Home },
-    { path: '/about', label: 'About', icon: User },
-    { path: '/practice-areas', label: 'Practice Areas', icon: Scale },
+    { path: '/', label: 'Home', icon: null },
+    { path: '/about', label: 'About', icon: null },
+    { path: '/practice-areas', label: 'Practice Areas', icon: null },
     { path: '/areas-we-serve', label: 'Areas We Serve', icon: null },
-    { path: '/resources', label: 'Resources', icon: FileText },
+    { path: '/resources', label: 'Resources', icon: null },
     { path: '/locations', label: 'Locations', icon: null },
-    { path: '/contact', label: 'Contact', icon: MessageSquare },
+    { path: '/contact', label: 'Contact', icon: null },
   ];
 
   const clientNavItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: Home },
-    { path: '/cases', label: 'My Cases', icon: FileText },
-    { path: '/appointments', label: 'Appointments', icon: Calendar },
-    { path: '/messages', label: 'Messages', icon: MessageSquare },
+    { path: '/dashboard', label: 'Dashboard', icon: null },
+    { path: '/cases', label: 'My Cases', icon: null },
+    { path: '/appointments', label: 'Appointments', icon: null },
+    { path: '/messages', label: 'Messages', icon: null },
   ];
 
   const adminNavItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: Home },
-    { path: '/cases', label: 'Cases', icon: FileText },
-    { path: '/appointments', label: 'Appointments', icon: Calendar },
-    { path: '/messages', label: 'Messages', icon: MessageSquare },
-    { path: '/clients', label: 'Clients', icon: Users },
+    { path: '/dashboard', label: 'Dashboard', icon: null },
+    { path: '/cases', label: 'Cases', icon: null },
+    { path: '/appointments', label: 'Appointments', icon: null },
+    { path: '/messages', label: 'Messages', icon: null },
+    { path: '/clients', label: 'Clients', icon: null },
   ];
 
   const advocateNavItems = [
@@ -126,7 +126,7 @@ const Navbar: React.FC = () => {
                     : 'text-gray-700 hover:text-navy-800 hover:bg-gray-100'
                 }`}
               >
-                <item.icon className="h-4 w-4" />
+                {item.icon && <item.icon className="h-4 w-4" />}
                 <span>{item.label}</span>
               </Link>
             ))}
@@ -256,7 +256,7 @@ const Navbar: React.FC = () => {
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <item.icon className="h-5 w-5" />
+                  {item.icon && <item.icon className="h-5 w-5" />}
                   <span>{item.label}</span>
                 </Link>
               ))}

@@ -20,6 +20,7 @@ const chatRoutes = require('./routes/chat');
 const dashboardRoutes = require('./routes/dashboard');
 const paymentRoutes = require('./routes/payments');
 const notificationRoutes = require('./routes/notifications');
+const whatsappRoutes = require('./routes/whatsapp');
 
 // Import middleware
 const { notFound } = require('./middleware/notFound');
@@ -144,6 +145,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/user-management', require('./routes/userManagement'));
 
 // Health check endpoint

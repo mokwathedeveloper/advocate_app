@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { Mail, Lock, User, Phone, Eye, EyeOff, Scale, GraduationCap, Award, FileText } from 'lucide-react';
+import { Mail, Lock, User, Phone, Eye, EyeOff, Scale, GraduationCap, Award, FileText, Key, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { RegisterData } from '../../types';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Card from '../../components/ui/Card';
+import toast from 'react-hot-toast';
 
 interface RegisterFormData extends RegisterData {
   confirmPassword: string;
@@ -17,7 +18,10 @@ interface RegisterFormData extends RegisterData {
 const Register: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showSuperKey, setShowSuperKey] = useState(false);
   const [selectedRole, setSelectedRole] = useState<'advocate'>('advocate');
+  const [superKeyVerified, setSuperKeyVerified] = useState(false);
+  const [superKeyInput, setSuperKeyInput] = useState('');
   const { register: registerUser, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -29,6 +33,21 @@ const Register: React.FC = () => {
   } = useForm<RegisterFormData>();
 
   const password = watch('password');
+
+  // Super key for advocate registration (in production, this should be environment variable)
+  const SUPER_KEY = 'ADVOCATE_MASTER_2024_LEGALPRO';
+
+  const verifySuperKey = (key: string) => {
+    if (key === SUPER_KEY) {
+      setSuperKeyVerified(true);
+      toast.success('Super key verified! You can now complete advocate registration.');
+    } else {
+      setSuperKeyVerified(false);
+      if (key.length > 0) {
+        toast.error('Invalid super key. Contact system administrator.');
+      }
+    }
+  };
 
   const specializations = [
     'Family Law',
@@ -44,6 +63,11 @@ const Register: React.FC = () => {
   ];
 
   const onSubmit = async (data: RegisterFormData) => {
+    if (!superKeyVerified) {
+      toast.error('Please verify the super key first');
+      return;
+    }
+
     try {
       const { confirmPassword, ...userData } = data;
       userData.role = 'advocate'; // Only advocates can register directly
@@ -95,8 +119,63 @@ const Register: React.FC = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Basic Information */}
+          {/* Super Key Verification */}
+          <div className="mb-8">
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+              <div className="flex items-start space-x-2">
+                <Key className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-blue-800">
+                  <p className="font-medium">Super Key Required</p>
+                  <p className="mt-1">
+                    Advocate registration requires a super key. Contact your system administrator
+                    or existing advocate to obtain the super key.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative">
+              <Input
+                label="Super Key *"
+                type={showSuperKey ? 'text' : 'password'}
+                placeholder="Enter advocate super key"
+                value={superKeyInput}
+                onChange={(e) => {
+                  setSuperKeyInput(e.target.value);
+                  verifySuperKey(e.target.value);
+                }}
+                className={superKeyVerified ? 'border-green-500 bg-green-50' : ''}
+                icon={<Key className="w-5 h-5 text-gray-400" />}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
+                onClick={() => setShowSuperKey(!showSuperKey)}
+              >
+                {showSuperKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+              {superKeyVerified && (
+                <div className="absolute right-10 top-9 text-green-600">
+                  <CheckCircle className="w-4 h-4" />
+                </div>
+              )}
+            </div>
+
+            {superKeyVerified && (
+              <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <p className="text-sm font-medium text-green-800">
+                    Super key verified! Complete your advocate registration below.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {superKeyVerified && (
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {/* Basic Information */}
             <div className="grid grid-cols-2 gap-4">
               <Input
                 label="First Name"
@@ -300,6 +379,7 @@ const Register: React.FC = () => {
               Register as Advocate (Superuser/Owner)
             </Button>
           </form>
+          )}
 
           <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-gray-600">
@@ -311,12 +391,7 @@ const Register: React.FC = () => {
                 Sign in here
               </Link>
             </p>
-            <p className="text-xs text-gray-500">
-              Are you a legal professional?{' '}
-              <Link to="/advocate-register" className="font-medium text-gold-600 hover:text-gold-500">
-                Register as Advocate (Superuser)
-              </Link>
-            </p>
+
           </div>
         </Card>
       </motion.div>

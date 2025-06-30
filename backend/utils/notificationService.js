@@ -1,6 +1,7 @@
 // Notification service for LegalPro v1.0.1
 const nodemailer = require('nodemailer');
 const twilio = require('twilio');
+const whatsappService = require('./whatsappService');
 require('dotenv').config();
 
 // Email setup using Nodemailer
@@ -181,7 +182,7 @@ async function sendTemplatedSMS(to, templateName, data) {
   }
 }
 
-// Send notification (email + SMS)
+// Send notification (email + SMS + WhatsApp)
 async function sendNotification(user, type, data) {
   const results = {};
 
@@ -203,7 +204,60 @@ async function sendNotification(user, type, data) {
     }
   }
 
+  // Send WhatsApp
+  if (user.phone && user.preferences?.whatsappNotifications !== false) {
+    try {
+      results.whatsapp = await sendWhatsAppNotification(user.phone, type, { name: user.firstName, ...data });
+    } catch (error) {
+      results.whatsapp = { error: error.message };
+    }
+  }
+
   return results;
+}
+
+// Send WhatsApp notification
+async function sendWhatsAppNotification(to, type, data) {
+  try {
+    switch (type) {
+      case 'welcome':
+        return await whatsappService.sendWelcomeMessage(to, data.name);
+
+      case 'appointmentReminder':
+        return await whatsappService.sendAppointmentReminder(
+          to,
+          data.name,
+          data.date,
+          data.time,
+          data.advocateName
+        );
+
+      case 'caseUpdate':
+        return await whatsappService.sendCaseUpdate(
+          to,
+          data.name,
+          data.caseTitle,
+          data.status,
+          data.nextSteps
+        );
+
+      case 'paymentConfirmation':
+        return await whatsappService.sendPaymentConfirmation(
+          to,
+          data.name,
+          data.amount,
+          data.transactionId,
+          data.service
+        );
+
+      default:
+        console.warn(`Unknown WhatsApp notification type: ${type}`);
+        return null;
+    }
+  } catch (error) {
+    console.error('Error sending WhatsApp notification:', error);
+    throw error;
+  }
 }
 
 module.exports = {
@@ -212,6 +266,7 @@ module.exports = {
   sendTemplatedEmail,
   sendTemplatedSMS,
   sendNotification,
+  sendWhatsAppNotification,
   emailTemplates,
   smsTemplates
 };

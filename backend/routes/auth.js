@@ -3,11 +3,12 @@ const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
 const authController = require('../controllers/authController');
+const { validateRegistration } = require('../middleware/validation');
 
 // @route   POST /api/auth/register
 // @desc    Register user
 // @access  Public
-router.post('/register', authController.register);
+router.post('/register', validateRegistration, authController.register);
 
 // @route   POST /api/auth/login
 // @desc    Login user

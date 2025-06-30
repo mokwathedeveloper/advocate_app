@@ -109,6 +109,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/user-management', require('./routes/userManagement'));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -36,6 +36,43 @@ const userSchema = new mongoose.Schema({
     enum: ['advocate', 'admin', 'client'],
     default: 'client'
   },
+  // Admin permissions (for admin role only)
+  permissions: {
+    canOpenFiles: {
+      type: Boolean,
+      default: false
+    },
+    canUploadFiles: {
+      type: Boolean,
+      default: false
+    },
+    canAdmitClients: {
+      type: Boolean,
+      default: false
+    },
+    canManageCases: {
+      type: Boolean,
+      default: false
+    },
+    canScheduleAppointments: {
+      type: Boolean,
+      default: false
+    },
+    canAccessReports: {
+      type: Boolean,
+      default: false
+    }
+  },
+  // Created by (for tracking who created admin/client accounts)
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  // Temporary password flag (for newly created accounts)
+  isTemporaryPassword: {
+    type: Boolean,
+    default: false
+  },
   phone: {
     type: String,
     trim: true

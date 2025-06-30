@@ -14,6 +14,20 @@ export interface User {
   education?: string;
   barAdmission?: string;
   isVerified?: boolean;
+  isActive?: boolean;
+  // Admin permissions (for admin role only)
+  permissions?: {
+    canOpenFiles: boolean;
+    canUploadFiles: boolean;
+    canAdmitClients: boolean;
+    canManageCases: boolean;
+    canScheduleAppointments: boolean;
+    canAccessReports: boolean;
+  };
+  // User management fields
+  createdBy?: string;
+  isTemporaryPassword?: boolean;
+  lastLogin?: string;
   createdAt: string;
   updatedAt: string;
 }

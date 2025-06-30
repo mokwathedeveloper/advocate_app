@@ -1,13 +1,14 @@
+// Admin Management page for LegalPro v1.0.1 - Enhanced with Advocate (Superuser) Features
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { 
-  Shield, 
-  Plus, 
-  Search, 
-  Filter, 
-  User, 
-  Mail, 
+import {
+  Shield,
+  Plus,
+  Search,
+  Filter,
+  User,
+  Mail,
   Phone,
   CheckCircle,
   XCircle,
@@ -16,12 +17,17 @@ import {
   Eye,
   UserCheck,
   UserX,
-  Settings
+  Settings,
+  Users,
+  UserPlus,
+  Key,
+  Crown
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
+import UserManagementDashboard from '../components/UserManagement/UserManagementDashboard';
 import toast from 'react-hot-toast';
 
 interface AdminFormData {
@@ -48,6 +54,7 @@ interface Admin {
 
 const AdminManagement: React.FC = () => {
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<'overview' | 'advanced'>('overview');
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<Admin | null>(null);
@@ -61,6 +68,19 @@ const AdminManagement: React.FC = () => {
     reset,
     formState: { errors }
   } = useForm<AdminFormData>();
+
+  // Check if user is advocate (superuser)
+  if (user?.role !== 'advocate') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="p-8 text-center">
+          <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600">Only advocates (superusers) can access admin management.</p>
+        </Card>
+      </div>
+    );
+  }
 
   // Mock admins data - replace with API call
   const mockAdmins: Admin[] = [
@@ -208,20 +228,56 @@ const AdminManagement: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-navy-800 mb-2">
-              Admin Management
+              <Crown className="inline-block w-8 h-8 mr-2 text-gold-600" />
+              Admin Management (Superuser)
             </h1>
             <p className="text-gray-600">
-              Manage system administrators and their permissions
+              Comprehensive user management system for advocates (superusers)
             </p>
           </div>
-          <Button
-            onClick={() => setShowCreateForm(true)}
-            className="mt-4 md:mt-0"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add New Admin
-          </Button>
         </div>
+
+        {/* Tab Navigation */}
+        <div className="mb-8">
+          <nav className="flex space-x-8" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'overview'
+                  ? 'border-navy-500 text-navy-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <Users className="w-4 h-4 inline-block mr-2" />
+              Admin Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('advanced')}
+              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'advanced'
+                  ? 'border-navy-500 text-navy-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <Crown className="w-4 h-4 inline-block mr-2" />
+              Advanced User Management
+            </button>
+          </nav>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <div>
+            {/* Original Admin Management Content */}
+            <div className="flex justify-end mb-6">
+              <Button
+                onClick={() => setShowCreateForm(true)}
+                className="flex items-center space-x-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add New Admin</span>
+              </Button>
+            </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -598,6 +654,15 @@ const AdminManagement: React.FC = () => {
                 </div>
               </div>
             </motion.div>
+          </div>
+        )}
+          </div>
+        )}
+
+        {/* Advanced User Management Tab */}
+        {activeTab === 'advanced' && (
+          <div>
+            <UserManagementDashboard />
           </div>
         )}
       </div>

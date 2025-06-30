@@ -146,27 +146,64 @@ const LoadingComponent: React.FC = () => (
   </div>
 );
 
-const ErrorComponent: React.FC<{ status: Status }> = ({ status }) => (
+const ErrorComponent: React.FC<{ status: Status; markers?: MarkerData[] }> = ({ status, markers = [] }) => (
   <div className="flex items-center justify-center h-96 bg-red-50 rounded-lg border border-red-200">
-    <div className="text-center p-6">
+    <div className="text-center p-6 max-w-md">
       <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
       <h3 className="text-lg font-semibold text-red-800 mb-2">Map Loading Error</h3>
       <p className="text-red-600 mb-4">
         {status === Status.FAILURE ? 'Failed to load Google Maps' : `Error: ${status}`}
       </p>
-      <p className="text-sm text-red-500">
-        Please check your internet connection or try refreshing the page.
+      <p className="text-sm text-red-500 mb-4">
+        This might be due to API key restrictions or network issues.
       </p>
+
+      {/* Fallback: Show locations as a list */}
+      {markers.length > 0 && (
+        <div className="mt-6 p-4 bg-white rounded-lg border">
+          <h4 className="font-semibold text-gray-800 mb-3">Office Locations:</h4>
+          <div className="space-y-2 text-left">
+            {markers.map((marker) => (
+              <div key={marker.id} className="text-sm">
+                <p className="font-medium text-gray-800">{marker.title}</p>
+                <p className="text-gray-600">{marker.address}</p>
+                {marker.phone && (
+                  <a href={`tel:${marker.phone}`} className="text-navy-600 hover:underline">
+                    {marker.phone}
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="mt-4 space-y-2">
+        <Button
+          size="sm"
+          onClick={() => window.location.reload()}
+          className="mr-2"
+        >
+          Retry Loading Map
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => window.open('https://developers.google.com/maps/documentation/javascript/get-api-key', '_blank')}
+        >
+          Get API Key
+        </Button>
+      </div>
     </div>
   </div>
 );
 
-const render = (status: Status) => {
+const render = (status: Status, markers?: MarkerData[]) => {
   switch (status) {
     case Status.LOADING:
       return <LoadingComponent />;
     case Status.FAILURE:
-      return <ErrorComponent status={status} />;
+      return <ErrorComponent status={status} markers={markers} />;
     case Status.SUCCESS:
       return <Map center={{ lat: -1.2921, lng: 36.8219 }} zoom={10} />;
     default:
@@ -213,9 +250,11 @@ const GoogleMapWrapper: React.FC<GoogleMapWrapperProps> = ({
     );
   }
 
+  const renderWithMarkers = (status: Status) => render(status, markers);
+
   return (
     <div className={className}>
-      <Wrapper apiKey={apiKey} render={render}>
+      <Wrapper apiKey={apiKey} render={renderWithMarkers}>
         <Map
           center={center}
           zoom={zoom}

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Repository Setup Script for LegalPro Case Management System
+# Repository Setup Script for LegalPro v1.0.1 Case Management System
 # This script sets up the complete GitHub workflow and repository structure
 
 # Colors for output

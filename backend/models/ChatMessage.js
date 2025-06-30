@@ -1,3 +1,4 @@
+// Chat message model for LegalPro v1.0.1
 const mongoose = require('mongoose');
 
 const chatMessageSchema = new mongoose.Schema({

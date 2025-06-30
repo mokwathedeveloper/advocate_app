@@ -1,11 +1,11 @@
-<div className=""></div>import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 
 interface ChatMessage {
   _id: string;

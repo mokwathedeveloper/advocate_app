@@ -19,6 +19,7 @@ import NotFound from './pages/NotFound';
 import Cases from './pages/Cases';
 import Appointments from './pages/Appointments';
 import Messages from './pages/Messages';
+import WhatsAppWidget from './components/whatsapp/WhatsAppWidget';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: string[] }> = ({ 
@@ -162,6 +163,13 @@ function App() {
             <Route path="*" element={<div className="min-h-screen flex items-center justify-center"><h1 className="text-2xl">Page Not Found</h1></div>} />
           </Route>
         </Routes>
+
+        {/* WhatsApp Widget - Available on all pages */}
+        <WhatsAppWidget
+          phoneNumber="254726745739"
+          message="Hello! I need legal assistance from LegalPro."
+          position="bottom-right"
+        />
       </Router>
     </AuthProvider>
   );

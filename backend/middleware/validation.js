@@ -1,3 +1,4 @@
+// Validation middleware for LegalPro v1.0.1
 const { body, validationResult } = require('express-validator');
 
 // Middleware to validate case creation

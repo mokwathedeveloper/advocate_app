@@ -8,6 +8,7 @@ import About from './pages/About';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import AdvocateRegister from './pages/auth/AdvocateRegister';
 import AdminManagement from './pages/AdminManagement';
 import PracticeAreas from './pages/PracticeAreas';
 import Contact from './pages/Contact';
@@ -84,6 +85,14 @@ function App() {
               element={
                 <PublicRoute>
                   <Register />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="advocate-register"
+              element={
+                <PublicRoute>
+                  <AdvocateRegister />
                 </PublicRoute>
               }
             />

@@ -1,3 +1,4 @@
+// Socket.IO handler for LegalPro v1.0.1
 const ChatMessage = require('../models/ChatMessage');
 
 const socketHandler = (io) => {

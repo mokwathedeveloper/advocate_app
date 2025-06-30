@@ -81,7 +81,9 @@ const register = async (req, res) => {
       userData.experience = experience;
       userData.education = education;
       userData.barAdmission = barAdmission;
-      userData.isVerified = false; // Advocates need manual verification
+      // Auto-verify advocates who register with super key (main advocates)
+      userData.isVerified = true;
+      userData.isActive = true;
     }
 
     console.log('Creating user with data:', userData);
@@ -344,6 +346,48 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// @desc    Verify advocate account (temporary endpoint for fixing existing accounts)
+// @route   POST /api/auth/verify-advocate
+// @access  Public (with super key)
+const verifyAdvocate = async (req, res) => {
+  try {
+    const { email, superKey } = req.body;
+
+    // Verify super key
+    if (superKey !== 'ADVOCATE_MASTER_2024_LEGALPRO') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid super key'
+      });
+    }
+
+    // Find and update the advocate
+    const user = await User.findOne({ email, role: 'advocate' });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Advocate account not found'
+      });
+    }
+
+    // Verify the account
+    user.isVerified = true;
+    user.isActive = true;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Advocate account verified successfully'
+    });
+  } catch (error) {
+    console.error('Verify advocate error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during verification'
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -351,5 +395,6 @@ module.exports = {
   updateDetails,
   updatePassword,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  verifyAdvocate
 };

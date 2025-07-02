@@ -249,12 +249,14 @@ const validatePhone = (phone) => {
   // Remove all spaces, dashes, and parentheses for validation
   const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
 
-  // Check if it's a valid mobile phone number
-  if (!validator.isMobilePhone(cleanPhone, 'any', { strictMode: false })) {
+  // Basic phone number validation - must be 10-15 digits with optional + prefix
+  const phoneRegex = /^\+?[1-9]\d{9,14}$/;
+
+  if (!phoneRegex.test(cleanPhone)) {
     result.isValid = false;
     result.errors.push({
       code: 'PHONE_INVALID_FORMAT',
-      message: 'Please provide a valid phone number'
+      message: 'Please provide a valid phone number (10-15 digits with optional + prefix)'
     });
   }
 

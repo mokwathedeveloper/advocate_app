@@ -18,7 +18,7 @@ global.testUtils = {
     lastName: 'Doe',
     email: 'john.doe@example.com',
     password: 'StrongPass123!',
-    phone: '+1234567890',
+    phone: '+12345678901',
     role: 'client',
     ...overrides
   }),
@@ -29,7 +29,7 @@ global.testUtils = {
     lastName: 'Smith',
     email: 'jane.smith@lawfirm.com',
     password: 'SecurePass456!',
-    phone: '+1234567890',
+    phone: '+12345678901',
     role: 'advocate',
     licenseNumber: 'LAW123456',
     specialization: ['Family Law', 'Corporate Law'],

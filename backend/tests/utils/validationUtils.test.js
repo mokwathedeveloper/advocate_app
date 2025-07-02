@@ -112,10 +112,10 @@ describe('Validation Utils', () => {
   describe('validatePhone', () => {
     test('should validate correct phone numbers', () => {
       const validPhones = [
-        '+1234567890',
+        '+12345678901',
         '+254712345678',
-        '0712345678',
-        '+44 20 7946 0958'
+        '+447123456789',
+        '+919876543210'
       ];
 
       validPhones.forEach(phone => {

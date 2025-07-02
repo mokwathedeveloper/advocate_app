@@ -17,17 +17,17 @@ const createTestApp = (middleware) => {
   const app = express();
   app.use(express.json());
   app.use(handleJSONError);
-  
+
   if (Array.isArray(middleware)) {
     middleware.forEach(mw => app.use(mw));
-  } else {
+  } else if (middleware) {
     app.use(middleware);
   }
-  
+
   app.post('/test', (req, res) => {
     res.json({ success: true, message: 'Test passed' });
   });
-  
+
   return app;
 };
 
@@ -38,9 +38,9 @@ describe('Validation Middleware', () => {
   });
 
   describe('validateContentType', () => {
-    const app = createTestApp(validateContentType);
-
     test('should pass with correct Content-Type', async () => {
+      const app = createTestApp(validateContentType);
+
       const response = await request(app)
         .post('/test')
         .set('Content-Type', 'application/json')
@@ -51,6 +51,8 @@ describe('Validation Middleware', () => {
     });
 
     test('should reject missing Content-Type', async () => {
+      const app = createTestApp(validateContentType);
+
       const response = await request(app)
         .post('/test')
         .send({ test: 'data' })
@@ -62,6 +64,8 @@ describe('Validation Middleware', () => {
     });
 
     test('should reject incorrect Content-Type', async () => {
+      const app = createTestApp(validateContentType);
+
       const response = await request(app)
         .post('/test')
         .set('Content-Type', 'text/plain')
@@ -89,17 +93,17 @@ describe('Validation Middleware', () => {
   });
 
   describe('validateRegistration', () => {
-    const app = createTestApp(validateRegistration);
-
     beforeEach(() => {
       User.findOne.mockResolvedValue(null); // No existing user by default
     });
 
     test('should pass with valid client data', async () => {
+      const app = createTestApp(validateRegistration);
       const validData = global.testUtils.createValidUserData();
 
       const response = await request(app)
         .post('/test')
+        .set('Content-Type', 'application/json')
         .send(validData)
         .expect(200);
 
@@ -107,10 +111,12 @@ describe('Validation Middleware', () => {
     });
 
     test('should pass with valid advocate data', async () => {
+      const app = createTestApp(validateRegistration);
       const validData = global.testUtils.createValidAdvocateData();
 
       const response = await request(app)
         .post('/test')
+        .set('Content-Type', 'application/json')
         .send(validData)
         .expect(200);
 
@@ -118,10 +124,12 @@ describe('Validation Middleware', () => {
     });
 
     test('should reject missing required fields', async () => {
+      const app = createTestApp(validateRegistration);
       const invalidData = global.testUtils.createInvalidUserData('missing-email');
 
       const response = await request(app)
         .post('/test')
+        .set('Content-Type', 'application/json')
         .send(invalidData)
         .expect(400);
 

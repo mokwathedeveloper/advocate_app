@@ -15,17 +15,8 @@ import {
   Upload,
   Download,
   MessageSquare,
-  Edit,
-  Trash2,
-  Eye,
   Tag,
   Flag,
-  ChevronLeft,
-  ChevronRight,
-  MoreVertical,
-  Archive,
-  RotateCcw,
-  UserCheck,
   SortAsc,
   SortDesc,
   X,
@@ -85,6 +76,19 @@ const PRIORITIES = [
   { value: 'urgent', label: 'Urgent', color: 'bg-red-100 text-red-800' }
 ];
 
+// Utility functions
+const getStatusColor = (status: string): string => {
+  const statusInfo = STATUSES.find(s => s.value === status);
+  return statusInfo?.color || 'bg-gray-100 text-gray-800';
+};
+
+const getPriorityColor = (priority: string): string => {
+  const priorityInfo = PRIORITIES.find(p => p.value === priority);
+  return priorityInfo?.color || 'bg-gray-100 text-gray-800';
+};
+
+
+
 const Cases: React.FC = () => {
   const { user } = useAuth();
 
@@ -96,15 +100,7 @@ const Cases: React.FC = () => {
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Pagination state
-  const [pagination, setPagination] = useState<PaginationInfo>({
-    page: 1,
-    limit: 10,
-    total: 0,
-    pages: 0,
-    hasNext: false,
-    hasPrev: false
-  });
+
 
   // Filter state
   const [filters, setFilters] = useState<CaseFilters>({
@@ -129,14 +125,6 @@ const Cases: React.FC = () => {
       const response = await caseService.getCases(currentFilters);
 
       setCases(response.data);
-      setPagination({
-        page: response.pagination.page,
-        limit: response.pagination.limit,
-        total: response.pagination.total,
-        pages: response.pagination.pages,
-        hasNext: response.pagination.hasNext,
-        hasPrev: response.pagination.hasPrev
-      });
 
       if (newFilters) {
         setFilters(currentFilters);
@@ -168,10 +156,7 @@ const Cases: React.FC = () => {
     handleFilterChange('search', searchTerm);
   };
 
-  // Handle pagination
-  const handlePageChange = (page: number) => {
-    loadCases({ page });
-  };
+
 
   // Handle sorting
   const handleSort = (sortBy: string) => {
@@ -184,89 +169,7 @@ const Cases: React.FC = () => {
     loadCases();
   }, []);
 
-  // Mock cases data for fallback - remove when API is fully integrated
-  const mockCases = [
-    {
-      id: '1',
-      caseNumber: 'CASE-2024-001',
-      title: 'Property Dispute Resolution',
-      description: 'Boundary dispute between neighboring properties requiring legal intervention and mediation.',
-      category: 'Property Law',
-      status: 'in_progress',
-      priority: 'high',
-      clientId: user?.id,
-      clientName: user ? `${user.firstName} ${user.lastName}` : 'John Doe',
-      assignedTo: 'John Kamau',
-      courtDate: '2024-04-15',
-      createdAt: '2024-03-01',
-      updatedAt: '2024-03-10',
-      documents: [
-        { id: '1', name: 'Property_Deed.pdf', type: 'pdf', size: 2048000, uploadedAt: '2024-03-05' },
-        { id: '2', name: 'Survey_Report.pdf', type: 'pdf', size: 1536000, uploadedAt: '2024-03-08' }
-      ],
-      notes: [
-        { id: '1', content: 'Initial consultation completed. Client provided all necessary documents.', author: 'John Kamau', createdAt: '2024-03-02' },
-        { id: '2', content: 'Site visit scheduled for next week to assess the boundary dispute.', author: 'John Kamau', createdAt: '2024-03-05' }
-      ],
-      timeline: [
-        { event: 'case_created', description: 'Case opened', date: '2024-03-01' },
-        { event: 'documents_uploaded', description: 'Property documents uploaded', date: '2024-03-05' },
-        { event: 'court_date_set', description: 'Court hearing scheduled', date: '2024-03-10' }
-      ]
-    },
-    {
-      id: '2',
-      caseNumber: 'CASE-2024-002',
-      title: 'Employment Contract Review',
-      description: 'Review and negotiation of employment contract terms and conditions.',
-      category: 'Employment Law',
-      status: 'pending',
-      priority: 'medium',
-      clientId: user?.id,
-      clientName: user ? `${user.firstName} ${user.lastName}` : 'Jane Smith',
-      assignedTo: 'Sarah Wanjiku',
-      courtDate: null,
-      createdAt: '2024-03-05',
-      updatedAt: '2024-03-08',
-      documents: [
-        { id: '3', name: 'Employment_Contract.pdf', type: 'pdf', size: 1024000, uploadedAt: '2024-03-06' }
-      ],
-      notes: [
-        { id: '3', content: 'Contract terms reviewed. Several clauses need modification.', author: 'Sarah Wanjiku', createdAt: '2024-03-07' }
-      ],
-      timeline: [
-        { event: 'case_created', description: 'Case opened', date: '2024-03-05' },
-        { event: 'documents_uploaded', description: 'Contract uploaded for review', date: '2024-03-06' }
-      ]
-    },
-    {
-      id: '3',
-      caseNumber: 'CASE-2024-003',
-      title: 'Family Custody Agreement',
-      description: 'Child custody arrangement and support agreement negotiation.',
-      category: 'Family Law',
-      status: 'completed',
-      priority: 'high',
-      clientId: user?.id,
-      clientName: user ? `${user.firstName} ${user.lastName}` : 'Mike Johnson',
-      assignedTo: 'Sarah Wanjiku',
-      courtDate: '2024-02-20',
-      createdAt: '2024-01-15',
-      updatedAt: '2024-02-25',
-      documents: [
-        { id: '4', name: 'Custody_Agreement.pdf', type: 'pdf', size: 1800000, uploadedAt: '2024-02-18' },
-        { id: '5', name: 'Financial_Statement.pdf', type: 'pdf', size: 900000, uploadedAt: '2024-02-10' }
-      ],
-      notes: [
-        { id: '4', content: 'Custody agreement finalized and approved by court.', author: 'Sarah Wanjiku', createdAt: '2024-02-22' }
-      ],
-      timeline: [
-        { event: 'case_created', description: 'Case opened', date: '2024-01-15' },
-        { event: 'court_hearing', description: 'Court hearing attended', date: '2024-02-20' },
-        { event: 'case_closed', description: 'Case successfully resolved', date: '2024-02-25' }
-      ]
-    }
-  ];
+
 
   // Case management functions
   const handleCreateCase = async (data: CaseFormData) => {
@@ -306,31 +209,6 @@ const Cases: React.FC = () => {
       console.error('Failed to update case status:', error);
       toast.error(error.message || 'Failed to update case status');
     }
-  };
-
-  // Utility functions
-  const getStatusInfo = (status: string) => {
-    return STATUSES.find(s => s.value === status) || STATUSES[0];
-  };
-
-  const getPriorityInfo = (priority: string) => {
-    return PRIORITIES.find(p => p.value === priority) || PRIORITIES[0];
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const getPriorityIcon = (priority: string) => {
@@ -552,7 +430,7 @@ const Cases: React.FC = () => {
 
         {/* Cases Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredCases.map((case_item, index) => (
+          {cases.map((case_item: Case, index: number) => (
             <motion.div
               key={case_item.id}
               initial={{ opacity: 0, y: 20 }}
@@ -587,7 +465,14 @@ const Cases: React.FC = () => {
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
                     <User className="w-4 h-4 mr-2" />
-                    <span>{case_item.assignedTo}</span>
+                    <span>
+                      {case_item.assignedTo
+                        ? typeof case_item.assignedTo === 'string'
+                          ? case_item.assignedTo
+                          : `${case_item.assignedTo.firstName} ${case_item.assignedTo.lastName}`
+                        : 'Unassigned'
+                      }
+                    </span>
                   </div>
                   {case_item.courtDate && (
                     <div className="flex items-center text-sm text-gray-600">
@@ -617,12 +502,12 @@ const Cases: React.FC = () => {
           ))}
         </div>
 
-        {filteredCases.length === 0 && (
+        {cases.length === 0 && (
           <div className="text-center py-12">
             <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No cases found</h3>
             <p className="text-gray-600">
-              {searchTerm || statusFilter !== 'all' || priorityFilter !== 'all'
+              {filters.search || filters.status !== 'all' || filters.priority !== 'all'
                 ? 'Try adjusting your search criteria'
                 : 'No cases have been created yet'
               }
@@ -724,11 +609,25 @@ const Cases: React.FC = () => {
                         </div>
                         <div>
                           <label className="text-sm font-medium text-gray-500">Assigned To</label>
-                          <p className="text-gray-900">{selectedCase.assignedTo}</p>
+                          <p className="text-gray-900">
+                            {selectedCase.assignedTo
+                              ? typeof selectedCase.assignedTo === 'string'
+                                ? selectedCase.assignedTo
+                                : `${selectedCase.assignedTo.firstName} ${selectedCase.assignedTo.lastName}`
+                              : 'Unassigned'
+                            }
+                          </p>
                         </div>
                         <div>
                           <label className="text-sm font-medium text-gray-500">Client</label>
-                          <p className="text-gray-900">{selectedCase.clientName}</p>
+                          <p className="text-gray-900">
+                            {selectedCase.clientId
+                              ? typeof selectedCase.clientId === 'string'
+                                ? selectedCase.clientId
+                                : `${selectedCase.clientId.firstName} ${selectedCase.clientId.lastName}`
+                              : 'Unknown Client'
+                            }
+                          </p>
                         </div>
                         {selectedCase.courtDate && (
                           <div>
@@ -742,12 +641,12 @@ const Cases: React.FC = () => {
                     <div>
                       <h3 className="text-lg font-semibold text-navy-800 mb-3">Timeline</h3>
                       <div className="space-y-3">
-                        {selectedCase.timeline.map((event, index) => (
+                        {selectedCase.timeline.map((event: any, index: number) => (
                           <div key={index} className="flex items-start space-x-3">
                             <div className="w-2 h-2 bg-navy-800 rounded-full mt-2"></div>
                             <div>
                               <p className="font-medium text-gray-900">{event.description}</p>
-                              <p className="text-sm text-gray-500">{new Date(event.date).toLocaleDateString()}</p>
+                              <p className="text-sm text-gray-500">{new Date(event.date || event.createdAt).toLocaleDateString()}</p>
                             </div>
                           </div>
                         ))}
@@ -789,7 +688,7 @@ const Cases: React.FC = () => {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={handleSubmit(handleCreateCase)} className="space-y-6">
                 <Input
                   label="Case Title"
                   error={errors.title?.message}

@@ -1,8 +1,11 @@
 // Authentication controller for LegalPro v1.0.1
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { sendNotification } = require('../utils/notificationService');
+const { authHelpers, TOKEN_TYPES, PASSWORD_CONFIG, USER_ROLES } = require('../config/auth');
+const { validationResult } = require('express-validator');
 
 // Generate JWT
 const signToken = (id) => {
@@ -388,6 +391,304 @@ const verifyAdvocate = async (req, res) => {
   }
 };
 
+// Enhanced authentication functions with RBAC
+
+/**
+ * Enhanced login with account lockout and session management
+ * @route POST /api/auth/enhanced-login
+ * @access Public
+ */
+const enhancedLogin = async (req, res) => {
+  try {
+    // Check for validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    const { email, password, rememberMe = false } = req.body;
+
+    // Find user by email
+    const user = await User.findOne({ email }).select('+password +loginAttempts +lockUntil');
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials',
+        error: 'INVALID_CREDENTIALS'
+      });
+    }
+
+    // Check if account is locked
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      const lockTimeRemaining = Math.ceil((user.lockUntil - Date.now()) / (1000 * 60));
+      return res.status(423).json({
+        success: false,
+        message: `Account is locked. Try again in ${lockTimeRemaining} minutes.`,
+        error: 'ACCOUNT_LOCKED',
+        lockTimeRemaining
+      });
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      // Increment login attempts
+      user.loginAttempts = (user.loginAttempts || 0) + 1;
+
+      // Lock account if max attempts reached
+      if (user.loginAttempts >= PASSWORD_CONFIG.maxLoginAttempts) {
+        user.lockUntil = Date.now() + PASSWORD_CONFIG.lockoutDuration;
+        await user.save();
+
+        return res.status(423).json({
+          success: false,
+          message: 'Account locked due to too many failed login attempts',
+          error: 'ACCOUNT_LOCKED'
+        });
+      }
+
+      await user.save();
+
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid credentials',
+        error: 'INVALID_CREDENTIALS',
+        attemptsRemaining: PASSWORD_CONFIG.maxLoginAttempts - user.loginAttempts
+      });
+    }
+
+    // Reset login attempts on successful login
+    user.loginAttempts = 0;
+    user.lockUntil = null;
+    user.lastLogin = new Date();
+
+    // Generate tokens with enhanced security
+    const tokenExpiry = rememberMe ? '30d' : '7d';
+
+    const accessToken = authHelpers.generateToken({
+      userId: user._id,
+      email: user.email,
+      role: user.role
+    }, TOKEN_TYPES.ACCESS, tokenExpiry);
+
+    const refreshToken = authHelpers.generateToken({
+      userId: user._id,
+      email: user.email,
+      role: user.role
+    }, TOKEN_TYPES.REFRESH);
+
+    // Manage refresh tokens (limit concurrent sessions)
+    const maxSessions = 3;
+    user.refreshTokens = user.refreshTokens || [];
+    user.refreshTokens.push(refreshToken);
+
+    // Remove oldest tokens if limit exceeded
+    if (user.refreshTokens.length > maxSessions) {
+      user.refreshTokens = user.refreshTokens.slice(-maxSessions);
+    }
+
+    await user.save();
+
+    // Remove sensitive data from response
+    const userResponse = user.toObject();
+    delete userResponse.password;
+    delete userResponse.refreshTokens;
+    delete userResponse.loginAttempts;
+    delete userResponse.lockUntil;
+
+    res.json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        user: userResponse,
+        tokens: {
+          accessToken,
+          refreshToken,
+          expiresIn: tokenExpiry
+        },
+        permissions: authHelpers.getRolePermissions(user.role)
+      }
+    });
+
+  } catch (error) {
+    console.error('Enhanced login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Login failed',
+      error: 'LOGIN_ERROR'
+    });
+  }
+};
+
+/**
+ * Refresh access token
+ * @route POST /api/auth/refresh-token
+ * @access Public
+ */
+const refreshAccessToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: 'Refresh token is required',
+        error: 'MISSING_REFRESH_TOKEN'
+      });
+    }
+
+    // Verify refresh token
+    let decoded;
+    try {
+      decoded = authHelpers.verifyToken(refreshToken);
+    } catch (error) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or expired refresh token',
+        error: 'INVALID_REFRESH_TOKEN'
+      });
+    }
+
+    // Check token type
+    if (decoded.type !== TOKEN_TYPES.REFRESH) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token type',
+        error: 'INVALID_TOKEN_TYPE'
+      });
+    }
+
+    // Find user and verify refresh token
+    const user = await User.findById(decoded.userId);
+
+    if (!user || !user.refreshTokens || !user.refreshTokens.includes(refreshToken)) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid refresh token',
+        error: 'INVALID_REFRESH_TOKEN'
+      });
+    }
+
+    // Generate new access token
+    const newAccessToken = authHelpers.generateToken({
+      userId: user._id,
+      email: user.email,
+      role: user.role
+    }, TOKEN_TYPES.ACCESS);
+
+    res.json({
+      success: true,
+      message: 'Token refreshed successfully',
+      data: {
+        accessToken: newAccessToken,
+        expiresIn: '7d'
+      }
+    });
+
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Token refresh failed',
+      error: 'TOKEN_REFRESH_ERROR'
+    });
+  }
+};
+
+/**
+ * Logout from current device
+ * @route POST /api/auth/logout
+ * @access Private
+ */
+const logout = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    const user = req.user;
+
+    if (refreshToken && user.refreshTokens) {
+      // Remove specific refresh token
+      user.refreshTokens = user.refreshTokens.filter(token => token !== refreshToken);
+      await user.save();
+    }
+
+    res.json({
+      success: true,
+      message: 'Logout successful'
+    });
+
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Logout failed',
+      error: 'LOGOUT_ERROR'
+    });
+  }
+};
+
+/**
+ * Logout from all devices
+ * @route POST /api/auth/logout-all
+ * @access Private
+ */
+const logoutAll = async (req, res) => {
+  try {
+    const user = req.user;
+
+    // Clear all refresh tokens
+    user.refreshTokens = [];
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Logged out from all devices successfully'
+    });
+
+  } catch (error) {
+    console.error('Logout all error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Logout from all devices failed',
+      error: 'LOGOUT_ALL_ERROR'
+    });
+  }
+};
+
+/**
+ * Get user permissions
+ * @route GET /api/auth/permissions
+ * @access Private
+ */
+const getUserPermissions = async (req, res) => {
+  try {
+    const user = req.user;
+    const permissions = authHelpers.getRolePermissions(user.role);
+
+    res.json({
+      success: true,
+      data: {
+        role: user.role,
+        permissions,
+        roleLevel: authHelpers.getRoleLevel(user.role)
+      }
+    });
+
+  } catch (error) {
+    console.error('Get permissions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get user permissions',
+      error: 'PERMISSIONS_ERROR'
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -396,5 +697,11 @@ module.exports = {
   updatePassword,
   forgotPassword,
   resetPassword,
-  verifyAdvocate
+  verifyAdvocate,
+  // Enhanced authentication functions
+  enhancedLogin,
+  refreshAccessToken,
+  logout,
+  logoutAll,
+  getUserPermissions
 };

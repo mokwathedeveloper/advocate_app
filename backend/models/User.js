@@ -1,6 +1,8 @@
 // User model for LegalPro v1.0.1
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const { USER_ROLES } = require('../config/auth');
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -33,8 +35,8 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['advocate', 'admin', 'client'],
-    default: 'client'
+    enum: Object.values(USER_ROLES),
+    default: USER_ROLES.CLIENT
   },
   // Admin permissions (for admin role only)
   permissions: {
@@ -84,7 +86,7 @@ const userSchema = new mongoose.Schema({
   licenseNumber: {
     type: String,
     required: function() {
-      return this.role === 'advocate';
+      return this.role === USER_ROLES.ADVOCATE;
     }
   },
   specialization: [{
@@ -103,7 +105,7 @@ const userSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: function() {
-      return this.role !== 'advocate'; // Advocates need manual verification
+      return this.role !== USER_ROLES.ADVOCATE; // Advocates need manual verification
     }
   },
   isActive: {
@@ -113,8 +115,66 @@ const userSchema = new mongoose.Schema({
   lastLogin: {
     type: Date
   },
+  // Enhanced authentication fields
+  refreshTokens: [{
+    type: String
+  }],
+  loginAttempts: {
+    type: Number,
+    default: 0
+  },
+  lockUntil: {
+    type: Date
+  },
+  passwordHistory: [{
+    password: String,
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  emailVerificationToken: String,
+  emailVerificationExpire: Date,
+  twoFactorSecret: {
+    type: String,
+    select: false
+  },
+  twoFactorEnabled: {
+    type: Boolean,
+    default: false
+  },
   resetPasswordToken: String,
-  resetPasswordExpire: Date
+  resetPasswordExpire: Date,
+  // Session management
+  activeSessions: [{
+    sessionId: String,
+    deviceInfo: String,
+    ipAddress: String,
+    userAgent: String,
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    lastActivity: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  // Security settings
+  securitySettings: {
+    requirePasswordChange: {
+      type: Boolean,
+      default: false
+    },
+    passwordChangeRequired: {
+      type: Boolean,
+      default: false
+    },
+    lastPasswordChange: {
+      type: Date,
+      default: Date.now
+    }
+  }
 }, {
   timestamps: true
 });
@@ -150,5 +210,159 @@ userSchema.methods.getResetPasswordToken = function() {
 
   return resetToken;
 };
+
+// Generate email verification token
+userSchema.methods.getEmailVerificationToken = function() {
+  const verificationToken = crypto.randomBytes(20).toString('hex');
+
+  this.emailVerificationToken = crypto
+    .createHash('sha256')
+    .update(verificationToken)
+    .digest('hex');
+
+  this.emailVerificationExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+
+  return verificationToken;
+};
+
+// Check if account is locked
+userSchema.methods.isLocked = function() {
+  return !!(this.lockUntil && this.lockUntil > Date.now());
+};
+
+// Increment login attempts
+userSchema.methods.incLoginAttempts = function() {
+  // If we have a previous lock that has expired, restart at 1
+  if (this.lockUntil && this.lockUntil < Date.now()) {
+    return this.updateOne({
+      $unset: {
+        lockUntil: 1
+      },
+      $set: {
+        loginAttempts: 1
+      }
+    });
+  }
+
+  const updates = { $inc: { loginAttempts: 1 } };
+
+  // Lock account after 5 attempts for 15 minutes
+  if (this.loginAttempts + 1 >= 5 && !this.isLocked()) {
+    updates.$set = { lockUntil: Date.now() + 15 * 60 * 1000 };
+  }
+
+  return this.updateOne(updates);
+};
+
+// Reset login attempts
+userSchema.methods.resetLoginAttempts = function() {
+  return this.updateOne({
+    $unset: {
+      loginAttempts: 1,
+      lockUntil: 1
+    }
+  });
+};
+
+// Add password to history
+userSchema.methods.addPasswordToHistory = function(password) {
+  this.passwordHistory = this.passwordHistory || [];
+  this.passwordHistory.push({
+    password: password,
+    createdAt: new Date()
+  });
+
+  // Keep only last 5 passwords
+  if (this.passwordHistory.length > 5) {
+    this.passwordHistory = this.passwordHistory.slice(-5);
+  }
+};
+
+// Check if password was used recently
+userSchema.methods.isPasswordRecentlyUsed = async function(password) {
+  if (!this.passwordHistory || this.passwordHistory.length === 0) {
+    return false;
+  }
+
+  for (const historyEntry of this.passwordHistory) {
+    const isMatch = await bcrypt.compare(password, historyEntry.password);
+    if (isMatch) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+// Add refresh token
+userSchema.methods.addRefreshToken = function(token) {
+  this.refreshTokens = this.refreshTokens || [];
+  this.refreshTokens.push(token);
+
+  // Keep only last 3 tokens (max concurrent sessions)
+  if (this.refreshTokens.length > 3) {
+    this.refreshTokens = this.refreshTokens.slice(-3);
+  }
+};
+
+// Remove refresh token
+userSchema.methods.removeRefreshToken = function(token) {
+  this.refreshTokens = this.refreshTokens.filter(t => t !== token);
+};
+
+// Clear all refresh tokens
+userSchema.methods.clearAllRefreshTokens = function() {
+  this.refreshTokens = [];
+};
+
+// Add session
+userSchema.methods.addSession = function(sessionData) {
+  this.activeSessions = this.activeSessions || [];
+  this.activeSessions.push({
+    sessionId: sessionData.sessionId,
+    deviceInfo: sessionData.deviceInfo,
+    ipAddress: sessionData.ipAddress,
+    userAgent: sessionData.userAgent,
+    createdAt: new Date(),
+    lastActivity: new Date()
+  });
+
+  // Keep only last 5 sessions
+  if (this.activeSessions.length > 5) {
+    this.activeSessions = this.activeSessions.slice(-5);
+  }
+};
+
+// Update session activity
+userSchema.methods.updateSessionActivity = function(sessionId) {
+  const session = this.activeSessions.find(s => s.sessionId === sessionId);
+  if (session) {
+    session.lastActivity = new Date();
+  }
+};
+
+// Remove session
+userSchema.methods.removeSession = function(sessionId) {
+  this.activeSessions = this.activeSessions.filter(s => s.sessionId !== sessionId);
+};
+
+// Virtual for full name
+userSchema.virtual('fullName').get(function() {
+  return `${this.firstName} ${this.lastName}`;
+});
+
+// Ensure virtual fields are serialized
+userSchema.set('toJSON', {
+  virtuals: true,
+  transform: function(doc, ret) {
+    delete ret.password;
+    delete ret.refreshTokens;
+    delete ret.passwordHistory;
+    delete ret.twoFactorSecret;
+    delete ret.resetPasswordToken;
+    delete ret.emailVerificationToken;
+    return ret;
+  }
+});
 
 module.exports = mongoose.model('User', userSchema);

@@ -8,6 +8,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Test coverage reports
+coverage/
+*.lcov
+
 node_modules
 dist
 dist-ssr

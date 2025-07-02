@@ -17,10 +17,16 @@ const transporter = nodemailer.createTransport({
 
 // Twilio setup for SMS with fallback if credentials missing
 let twilioClient = null;
-if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-  twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+if (process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN &&
+    process.env.TWILIO_ACCOUNT_SID.startsWith('AC')) {
+  try {
+    twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  } catch (error) {
+    console.warn('Twilio initialization failed. SMS notifications disabled.', error.message);
+  }
 } else {
-  console.warn('Twilio credentials missing. SMS notifications disabled.');
+  console.warn('Twilio credentials missing or invalid. SMS notifications disabled.');
 }
 
 // Send email notification

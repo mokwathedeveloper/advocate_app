@@ -1,0 +1,102 @@
+{
+  "welcome": {
+    "message": "Welcome to LegalPro, {{firstName}}! Your account is now active. Access your dashboard at {{dashboardUrl}} or call us at +254726745739 for assistance. - LegalPro",
+    "maxLength": 160,
+    "variables": ["firstName", "dashboardUrl"]
+  },
+  "appointmentConfirmation": {
+    "message": "Appointment confirmed! {{clientName}}, you're scheduled with {{advocateName}} on {{appointmentDate}} at {{appointmentTime}}. Location: {{location}}. Ref: {{appointmentId}} - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "advocateName", "appointmentDate", "appointmentTime", "location", "appointmentId"]
+  },
+  "appointmentReminder": {
+    "message": "Reminder: {{clientName}}, your appointment with {{advocateName}} is tomorrow at {{appointmentTime}}. Please arrive 10 minutes early. Contact: +254726745739 - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "advocateName", "appointmentTime"]
+  },
+  "appointmentReminderToday": {
+    "message": "Today's appointment: {{clientName}}, your meeting with {{advocateName}} is at {{appointmentTime}}. Location: {{location}}. Bring your ID and documents. - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "advocateName", "appointmentTime", "location"]
+  },
+  "caseUpdate": {
+    "message": "Case Update: {{clientName}}, your case '{{caseTitle}}' status changed to {{status}}. {{updateMessage}} Check dashboard for details. - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "caseTitle", "status", "updateMessage"]
+  },
+  "caseUpdateDetailed": {
+    "message": "{{clientName}}, important update on case {{caseId}}: {{status}}. {{nextSteps}} Login to view full details or call +254726745739. - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "caseId", "status", "nextSteps"]
+  },
+  "paymentConfirmation": {
+    "message": "Payment confirmed! {{clientName}}, KES {{amount}} received for {{service}}. Transaction: {{transactionId}}. Receipt available in dashboard. Thank you! - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "amount", "service", "transactionId"]
+  },
+  "paymentReminder": {
+    "message": "Payment reminder: {{clientName}}, KES {{amount}} due for {{service}}. Pay via M-Pesa or dashboard. Due: {{dueDate}}. Contact: +254726745739 - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "amount", "service", "dueDate"]
+  },
+  "documentRequest": {
+    "message": "Document needed: {{clientName}}, please upload {{documentType}} for case {{caseTitle}}. Deadline: {{deadline}}. Upload via dashboard or email. - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "documentType", "caseTitle", "deadline"]
+  },
+  "hearingNotice": {
+    "message": "Court hearing: {{clientName}}, your case {{caseTitle}} is scheduled for {{hearingDate}} at {{hearingTime}}. Venue: {{venue}}. Be there 30min early. - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "caseTitle", "hearingDate", "hearingTime", "venue"]
+  },
+  "passwordReset": {
+    "message": "LegalPro password reset requested. Your verification code is: {{resetCode}}. Valid for 15 minutes. If not requested, ignore this message. - LegalPro",
+    "maxLength": 160,
+    "variables": ["resetCode"]
+  },
+  "accountVerification": {
+    "message": "Verify your LegalPro account. Your verification code is: {{verificationCode}}. Enter this code to complete registration. Valid for 10 minutes. - LegalPro",
+    "maxLength": 160,
+    "variables": ["verificationCode"]
+  },
+  "advocateAssigned": {
+    "message": "Good news! {{clientName}}, advocate {{advocateName}} has been assigned to your case '{{caseTitle}}'. They will contact you within 24 hours. - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "advocateName", "caseTitle"]
+  },
+  "consultationScheduled": {
+    "message": "Free consultation scheduled! {{clientName}}, meet {{advocateName}} on {{date}} at {{time}}. Call +254726745739 to confirm or reschedule. - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "advocateName", "date", "time"]
+  },
+  "emergencyContact": {
+    "message": "Emergency legal assistance: {{clientName}}, we received your urgent request. An advocate will call you within 30 minutes. Stay available at this number. - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName"]
+  },
+  "feedbackRequest": {
+    "message": "How was your experience? {{clientName}}, please rate your recent service with {{advocateName}}. Visit {{feedbackUrl}} or reply with 1-5 stars. - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "advocateName", "feedbackUrl"]
+  },
+  "maintenanceNotice": {
+    "message": "System maintenance: LegalPro dashboard will be unavailable on {{maintenanceDate}} from {{startTime}} to {{endTime}}. Plan accordingly. - LegalPro",
+    "maxLength": 160,
+    "variables": ["maintenanceDate", "startTime", "endTime"]
+  },
+  "promotionalOffer": {
+    "message": "Special offer! {{clientName}}, get {{discount}}% off legal consultations this month. Book now: {{bookingUrl}} or call +254726745739. Limited time! - LegalPro",
+    "maxLength": 160,
+    "variables": ["clientName", "discount", "bookingUrl"]
+  },
+  "birthdayWish": {
+    "message": "Happy Birthday {{firstName}}! 🎉 LegalPro wishes you a wonderful year ahead. As a gift, enjoy 20% off your next consultation. - LegalPro Team",
+    "maxLength": 160,
+    "variables": ["firstName"]
+  },
+  "holidayGreeting": {
+    "message": "{{holidayName}} greetings from LegalPro! {{clientName}}, we wish you and your family joy and prosperity. Our offices resume {{resumeDate}}. - LegalPro",
+    "maxLength": 160,
+    "variables": ["holidayName", "clientName", "resumeDate"]
+  }
+}

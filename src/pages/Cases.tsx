@@ -40,14 +40,7 @@ interface CaseFormData {
   courtDate?: string;
 }
 
-interface PaginationInfo {
-  page: number;
-  limit: number;
-  total: number;
-  pages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
+
 
 const CATEGORIES = [
   'Family Law',
@@ -185,31 +178,7 @@ const Cases: React.FC = () => {
     }
   };
 
-  const handleDeleteCase = async (caseId: string) => {
-    if (!window.confirm('Are you sure you want to archive this case?')) {
-      return;
-    }
 
-    try {
-      await caseService.deleteCase(caseId);
-      toast.success('Case archived successfully');
-      await loadCases();
-    } catch (error: any) {
-      console.error('Failed to archive case:', error);
-      toast.error(error.message || 'Failed to archive case');
-    }
-  };
-
-  const handleStatusChange = async (caseId: string, newStatus: string) => {
-    try {
-      await caseService.updateCaseStatus(caseId, newStatus);
-      toast.success('Case status updated successfully');
-      await loadCases();
-    } catch (error: any) {
-      console.error('Failed to update case status:', error);
-      toast.error(error.message || 'Failed to update case status');
-    }
-  };
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
@@ -575,7 +544,12 @@ const Cases: React.FC = () => {
                         {selectedCase.notes.map((note) => (
                           <div key={note.id} className="p-4 bg-gray-50 rounded-lg">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="font-medium text-gray-900">{note.author}</span>
+                              <span className="font-medium text-gray-900">
+                                {typeof note.author === 'string'
+                                  ? note.author
+                                  : `${note.author.firstName} ${note.author.lastName}`
+                                }
+                              </span>
                               <span className="text-sm text-gray-500">{new Date(note.createdAt).toLocaleDateString()}</span>
                             </div>
                             <p className="text-gray-600">{note.content}</p>

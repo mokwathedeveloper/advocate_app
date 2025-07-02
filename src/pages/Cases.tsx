@@ -1,15 +1,15 @@
 // Cases management page for LegalPro v1.0.1
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { 
-  FileText, 
-  Plus, 
-  Search, 
-  Filter, 
-  Calendar, 
-  User, 
-  Clock, 
+import {
+  FileText,
+  Plus,
+  Search,
+  Filter,
+  Calendar,
+  User,
+  Clock,
   AlertCircle,
   CheckCircle,
   Upload,
@@ -19,12 +19,24 @@ import {
   Trash2,
   Eye,
   Tag,
-  Flag
+  Flag,
+  ChevronLeft,
+  ChevronRight,
+  MoreVertical,
+  Archive,
+  RotateCcw,
+  UserCheck,
+  SortAsc,
+  SortDesc,
+  X,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
+import { caseService, CaseFilters } from '../services/caseService';
+import { Case } from '../types';
 import toast from 'react-hot-toast';
 
 interface CaseFormData {
@@ -32,27 +44,147 @@ interface CaseFormData {
   description: string;
   category: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  clientId?: string;
+  clientId: string;
+  assignedTo?: string;
+  courtDate?: string;
 }
+
+interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+const CATEGORIES = [
+  'Family Law',
+  'Corporate Law',
+  'Criminal Defense',
+  'Property Law',
+  'Employment Law',
+  'Constitutional Law',
+  'Tax Law',
+  'Immigration Law',
+  'Intellectual Property',
+  'Environmental Law'
+];
+
+const STATUSES = [
+  { value: 'pending', label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
+  { value: 'in_progress', label: 'In Progress', color: 'bg-blue-100 text-blue-800' },
+  { value: 'completed', label: 'Completed', color: 'bg-green-100 text-green-800' },
+  { value: 'closed', label: 'Closed', color: 'bg-gray-100 text-gray-800' }
+];
+
+const PRIORITIES = [
+  { value: 'low', label: 'Low', color: 'bg-gray-100 text-gray-800' },
+  { value: 'medium', label: 'Medium', color: 'bg-blue-100 text-blue-800' },
+  { value: 'high', label: 'High', color: 'bg-orange-100 text-orange-800' },
+  { value: 'urgent', label: 'Urgent', color: 'bg-red-100 text-red-800' }
+];
 
 const Cases: React.FC = () => {
   const { user } = useAuth();
-  const [cases, setCases] = useState([]);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [selectedCase, setSelectedCase] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [priorityFilter, setPriorityFilter] = useState('all');
+
+  // State management
+  const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm<CaseFormData>();
+  // Pagination state
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 0,
+    hasNext: false,
+    hasPrev: false
+  });
 
-  // Mock cases data - replace with API call
+  // Filter state
+  const [filters, setFilters] = useState<CaseFilters>({
+    search: '',
+    status: '',
+    category: '',
+    priority: '',
+    assignedTo: '',
+    page: 1,
+    limit: 10,
+    sortBy: 'createdAt',
+    sortOrder: 'desc'
+  });
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<CaseFormData>();
+
+  // Load cases from API
+  const loadCases = useCallback(async (newFilters?: Partial<CaseFilters>) => {
+    try {
+      setLoading(true);
+      const currentFilters = { ...filters, ...newFilters };
+      const response = await caseService.getCases(currentFilters);
+
+      setCases(response.data);
+      setPagination({
+        page: response.pagination.page,
+        limit: response.pagination.limit,
+        total: response.pagination.total,
+        pages: response.pagination.pages,
+        hasNext: response.pagination.hasNext,
+        hasPrev: response.pagination.hasPrev
+      });
+
+      if (newFilters) {
+        setFilters(currentFilters);
+      }
+    } catch (error) {
+      console.error('Failed to load cases:', error);
+      toast.error('Failed to load cases');
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
+
+  // Refresh cases
+  const refreshCases = async () => {
+    setRefreshing(true);
+    await loadCases();
+    setRefreshing(false);
+    toast.success('Cases refreshed');
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (key: keyof CaseFilters, value: any) => {
+    const newFilters = { ...filters, [key]: value, page: 1 };
+    loadCases(newFilters);
+  };
+
+  // Handle search
+  const handleSearch = (searchTerm: string) => {
+    handleFilterChange('search', searchTerm);
+  };
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    loadCases({ page });
+  };
+
+  // Handle sorting
+  const handleSort = (sortBy: string) => {
+    const newSortOrder = filters.sortBy === sortBy && filters.sortOrder === 'desc' ? 'asc' : 'desc';
+    loadCases({ sortBy, sortOrder: newSortOrder });
+  };
+
+  // Load cases on component mount
+  useEffect(() => {
+    loadCases();
+  }, []);
+
+  // Mock cases data for fallback - remove when API is fully integrated
   const mockCases = [
     {
       id: '1',
@@ -136,32 +268,69 @@ const Cases: React.FC = () => {
     }
   ];
 
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setCases(mockCases);
-      setLoading(false);
-    }, 1000);
-  }, []);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'text-green-600 bg-green-100';
-      case 'in_progress': return 'text-blue-600 bg-blue-100';
-      case 'pending': return 'text-yellow-600 bg-yellow-100';
-      case 'closed': return 'text-gray-600 bg-gray-100';
-      default: return 'text-gray-600 bg-gray-100';
+  // Case management functions
+  const handleCreateCase = async (data: CaseFormData) => {
+    try {
+      await caseService.createCase(data);
+      toast.success('Case created successfully');
+      setShowCreateForm(false);
+      reset();
+      await loadCases();
+    } catch (error: any) {
+      console.error('Failed to create case:', error);
+      toast.error(error.message || 'Failed to create case');
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'text-red-600';
-      case 'high': return 'text-orange-600';
-      case 'medium': return 'text-yellow-600';
-      case 'low': return 'text-green-600';
-      default: return 'text-gray-600';
+  const handleDeleteCase = async (caseId: string) => {
+    if (!window.confirm('Are you sure you want to archive this case?')) {
+      return;
     }
+
+    try {
+      await caseService.deleteCase(caseId);
+      toast.success('Case archived successfully');
+      await loadCases();
+    } catch (error: any) {
+      console.error('Failed to archive case:', error);
+      toast.error(error.message || 'Failed to archive case');
+    }
+  };
+
+  const handleStatusChange = async (caseId: string, newStatus: string) => {
+    try {
+      await caseService.updateCaseStatus(caseId, newStatus);
+      toast.success('Case status updated successfully');
+      await loadCases();
+    } catch (error: any) {
+      console.error('Failed to update case status:', error);
+      toast.error(error.message || 'Failed to update case status');
+    }
+  };
+
+  // Utility functions
+  const getStatusInfo = (status: string) => {
+    return STATUSES.find(s => s.value === status) || STATUSES[0];
+  };
+
+  const getPriorityInfo = (priority: string) => {
+    return PRIORITIES.find(p => p.value === priority) || PRIORITIES[0];
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const getPriorityIcon = (priority: string) => {
@@ -174,27 +343,21 @@ const Cases: React.FC = () => {
     }
   };
 
-  const onSubmit = async (data: CaseFormData) => {
-    try {
-      // API call to create case
-      console.log('Creating case:', data);
-      toast.success('Case created successfully!');
-      reset();
-      setShowCreateForm(false);
-    } catch (error) {
-      toast.error('Failed to create case');
-    }
+  // Clear all filters
+  const clearFilters = () => {
+    const clearedFilters = {
+      search: '',
+      status: '',
+      category: '',
+      priority: '',
+      assignedTo: '',
+      page: 1,
+      limit: 10,
+      sortBy: 'createdAt',
+      sortOrder: 'desc' as const
+    };
+    loadCases(clearedFilters);
   };
-
-  const filteredCases = cases.filter(case_item => {
-    const matchesSearch = case_item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         case_item.caseNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         case_item.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || case_item.status === statusFilter;
-    const matchesPriority = priorityFilter === 'all' || case_item.priority === priorityFilter;
-    
-    return matchesSearch && matchesStatus && matchesPriority;
-  });
 
   if (loading) {
     return (
@@ -231,48 +394,161 @@ const Cases: React.FC = () => {
           )}
         </div>
 
-        {/* Filters and Search */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search cases..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-navy-500 focus:border-transparent"
-            />
+        {/* Search and Filters */}
+        <Card className="p-6 mb-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search cases..."
+                value={filters.search}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-navy-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Quick Filters */}
+            <div className="flex flex-wrap gap-2">
+              <select
+                value={filters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-navy-500 focus:border-transparent text-sm"
+              >
+                <option value="">All Status</option>
+                {STATUSES.map(status => (
+                  <option key={status.value} value={status.value}>{status.label}</option>
+                ))}
+              </select>
+
+              <select
+                value={filters.priority}
+                onChange={(e) => handleFilterChange('priority', e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-navy-500 focus:border-transparent text-sm"
+              >
+                <option value="">All Priority</option>
+                {PRIORITIES.map(priority => (
+                  <option key={priority.value} value={priority.value}>{priority.label}</option>
+                ))}
+              </select>
+
+              <select
+                value={filters.category}
+                onChange={(e) => handleFilterChange('category', e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-navy-500 focus:border-transparent text-sm"
+              >
+                <option value="">All Categories</option>
+                {CATEGORIES.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center"
+              >
+                <Filter className="w-4 h-4 mr-2" />
+                More Filters
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refreshCases}
+                disabled={refreshing}
+                className="flex items-center"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+
+              {(filters.search || filters.status || filters.category || filters.priority) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="flex items-center text-red-600 hover:text-red-700"
+                >
+                  <X className="w-4 h-4 mr-2" />
+                  Clear
+                </Button>
+              )}
+            </div>
           </div>
-          
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-navy-500 focus:border-transparent"
-          >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="closed">Closed</option>
-          </select>
 
-          <select
-            value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-navy-500 focus:border-transparent"
-          >
-            <option value="all">All Priority</option>
-            <option value="urgent">Urgent</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
+          {/* Advanced Filters */}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-4 pt-4 border-t border-gray-200"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="date"
+                        value={filters.startDate || ''}
+                        onChange={(e) => handleFilterChange('startDate', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-navy-500 focus:border-transparent text-sm"
+                      />
+                      <input
+                        type="date"
+                        value={filters.endDate || ''}
+                        onChange={(e) => handleFilterChange('endDate', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-navy-500 focus:border-transparent text-sm"
+                      />
+                    </div>
+                  </div>
 
-          <Button variant="outline" className="flex items-center">
-            <Filter className="w-4 h-4 mr-2" />
-            More Filters
-          </Button>
-        </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                    <div className="flex gap-2">
+                      <select
+                        value={filters.sortBy}
+                        onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-navy-500 focus:border-transparent text-sm"
+                      >
+                        <option value="createdAt">Created Date</option>
+                        <option value="updatedAt">Updated Date</option>
+                        <option value="title">Title</option>
+                        <option value="priority">Priority</option>
+                        <option value="status">Status</option>
+                      </select>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSort(filters.sortBy || 'createdAt')}
+                        className="px-3"
+                      >
+                        {filters.sortOrder === 'asc' ? <SortAsc className="w-4 h-4" /> : <SortDesc className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Results Per Page</label>
+                    <select
+                      value={filters.limit}
+                      onChange={(e) => handleFilterChange('limit', parseInt(e.target.value))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-navy-500 focus:border-transparent text-sm"
+                    >
+                      <option value={10}>10 per page</option>
+                      <option value={25}>25 per page</option>
+                      <option value={50}>50 per page</option>
+                    </select>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Card>
 
         {/* Cases Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">

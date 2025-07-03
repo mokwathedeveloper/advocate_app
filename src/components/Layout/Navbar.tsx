@@ -106,8 +106,8 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <Scale className="h-8 w-8 text-navy-800" />
-              <span className="text-xl font-bold text-navy-800">
+              <Scale className="h-8 w-8 text-primary-800" />
+              <span className="text-xl font-bold text-primary-800">
                 LegalPro
               </span>
             </Link>
@@ -121,8 +121,8 @@ const Navbar: React.FC = () => {
                 to={item.path}
                 className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive(item.path)
-                    ? 'bg-navy-100 text-navy-800'
-                    : 'text-gray-700 hover:text-navy-800 hover:bg-gray-100'
+                    ? 'bg-primary-100 text-primary-800'
+                    : 'text-neutral-700 hover:text-primary-800 hover:bg-neutral-100'
                 }`}
               >
                 {item.icon && <item.icon className="h-4 w-4" />}
@@ -140,15 +140,15 @@ const Navbar: React.FC = () => {
                   <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center space-x-2 text-gray-700 hover:text-navy-800 focus:outline-none"
+                    className="flex items-center space-x-2 text-neutral-700 hover:text-primary-800 focus:outline-none"
                   >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      user.role === 'advocate' ? 'bg-gold-100' : 'bg-navy-100'
+                      user.role === 'advocate' ? 'bg-secondary-100' : 'bg-primary-100'
                     }`}>
                       {user.role === 'advocate' ? (
-                        <Scale className="h-4 w-4 text-gold-600" />
+                        <Scale className="h-4 w-4 text-secondary-600" />
                       ) : (
-                        <User className="h-4 w-4 text-navy-800" />
+                        <User className="h-4 w-4 text-primary-800" />
                       )}
                     </div>
                     <div className="text-left">
@@ -203,13 +203,13 @@ const Navbar: React.FC = () => {
                 <div className="flex items-center space-x-2">
                   <Link
                     to="/login"
-                    className="text-gray-700 hover:text-navy-800 px-3 py-2 rounded-md text-sm font-medium"
+                    className="text-neutral-700 hover:text-primary-800 px-3 py-2 rounded-md text-sm font-medium"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
-                    className="bg-navy-800 text-white hover:bg-navy-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                    className="bg-primary-800 text-white hover:bg-primary-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
                   >
                     Get Started
                   </Link>
@@ -250,8 +250,8 @@ const Navbar: React.FC = () => {
                   to={item.path}
                   className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium ${
                     isActive(item.path)
-                      ? 'bg-navy-100 text-navy-800'
-                      : 'text-gray-700 hover:text-navy-800 hover:bg-gray-100'
+                      ? 'bg-primary-100 text-primary-800'
+                      : 'text-neutral-700 hover:text-primary-800 hover:bg-neutral-100'
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -289,7 +289,7 @@ const Navbar: React.FC = () => {
                       handleLogout();
                       setIsMenuOpen(false);
                     }}
-                    className="flex items-center space-x-2 w-full px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
+                    className="flex items-center space-x-2 w-full px-3 py-2 rounded-md text-base font-medium text-neutral-700 hover:text-primary-800 hover:bg-neutral-100"
                   >
                     <LogOut className="h-5 w-5" />
                     <span>Sign Out</span>
@@ -299,14 +299,14 @@ const Navbar: React.FC = () => {
                 <div className="border-t pt-2 mt-2 space-y-1">
                   <Link
                     to="/login"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-neutral-700 hover:text-primary-800 hover:bg-neutral-100"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
-                    className="block px-3 py-2 rounded-md text-base font-medium bg-navy-800 text-white hover:bg-navy-700"
+                    className="block px-3 py-2 rounded-md text-base font-medium bg-primary-800 text-white hover:bg-primary-700"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Get Started

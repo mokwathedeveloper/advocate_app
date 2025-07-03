@@ -110,26 +110,26 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
+    <div className="min-h-screen bg-neutral-50">
+      <div className="container-mobile py-6 sm:py-8">
+        {/* Header - Mobile-First Responsive */}
+        <div className="mb-6 sm:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-3xl font-bold text-navy-800 mb-2">
+            <h1 className="heading-page text-primary-800 mb-2">
               Welcome back, {user?.firstName}!
             </h1>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-neutral-600">
               Here's an overview of your legal matters and upcoming appointments.
             </p>
           </motion.div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Stats Cards - Mobile-First Grid */}
+        <div className="grid-mobile-4 mb-6 sm:mb-8">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
@@ -137,46 +137,46 @@ const Dashboard: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="p-6">
+              <Card padding="md">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                    <p className="text-2xl font-bold text-navy-800">{stat.value}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm text-neutral-600 mb-1 truncate">{stat.label}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-primary-800">{stat.value}</p>
                   </div>
-                  <stat.icon className={`w-8 h-8 ${stat.color}`} />
+                  <stat.icon className={`w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0 ml-2 ${stat.color}`} />
                 </div>
               </Card>
             </motion.div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Cases */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+          {/* Recent Cases - Mobile-First Responsive */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Card className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-navy-800">Recent Cases</h2>
+            <Card padding="md">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="heading-card text-primary-800">Recent Cases</h2>
                 <Button variant="ghost" size="sm">
                   View All
                 </Button>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {recentCases.map((case_item) => (
-                  <div key={case_item.id} className="border-b border-gray-200 pb-4 last:border-b-0">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-medium text-navy-800">{case_item.title}</h3>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(case_item.status)}`}>
+                  <div key={case_item.id} className="border-b border-neutral-200 pb-3 sm:pb-4 last:border-b-0">
+                    <div className="flex items-start justify-between mb-2 gap-2">
+                      <h3 className="font-medium text-primary-800 text-sm sm:text-base leading-tight">{case_item.title}</h3>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 ${getStatusColor(case_item.status)}`}>
                         {case_item.status.replace('_', ' ')}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{case_item.nextAction}</p>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>Updated {case_item.lastUpdate}</span>
-                      <span className={`font-medium ${getPriorityColor(case_item.priority)}`}>
+                    <p className="text-xs sm:text-sm text-neutral-600 mb-2 leading-relaxed">{case_item.nextAction}</p>
+                    <div className="flex items-center justify-between text-xs text-neutral-500 gap-2">
+                      <span className="truncate">Updated {case_item.lastUpdate}</span>
+                      <span className={`font-medium whitespace-nowrap ${getPriorityColor(case_item.priority)}`}>
                         {case_item.priority} priority
                       </span>
                     </div>

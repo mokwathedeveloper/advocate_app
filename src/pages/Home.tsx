@@ -77,9 +77,9 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen" role="main">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-navy-900 via-navy-800 to-navy-700 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-navy-900 via-navy-800 to-navy-700 text-white overflow-hidden" role="banner" aria-labelledby="hero-heading">
         <div className="absolute inset-0 bg-black opacity-20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -88,7 +88,7 @@ const Home: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+              <h1 id="hero-heading" className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
                 Expert Legal Solutions for Your{' '}
                 <span className="text-gold-400">Peace of Mind</span>
               </h1>
@@ -97,15 +97,15 @@ const Home: React.FC = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/appointments">
-                  <Button size="lg" className="w-full sm:w-auto">
-                    <Calendar className="w-5 h-5 mr-2" />
+                  <Button size="lg" className="w-full sm:w-auto" aria-label="Book a legal consultation appointment">
+                    <Calendar className="w-5 h-5 mr-2" aria-hidden="true" />
                     Book Consultation
                   </Button>
                 </Link>
                 <Link to="/about">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-navy-800">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-navy-800" aria-label="Learn more about our legal services">
                     Learn More
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    <ArrowRight className="w-5 h-5 ml-2" aria-hidden="true" />
                   </Button>
                 </Link>
               </div>
@@ -149,8 +149,9 @@ const Home: React.FC = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" aria-labelledby="stats-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 id="stats-heading" className="sr-only">Our Track Record</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <motion.div
@@ -171,10 +172,10 @@ const Home: React.FC = () => {
       </section>
 
       {/* Practice Areas */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50" aria-labelledby="practice-areas-heading">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-navy-800 mb-4">
+            <h2 id="practice-areas-heading" className="text-3xl md:text-4xl font-bold text-navy-800 mb-4">
               Our Practice Areas
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -182,17 +183,23 @@ const Home: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" role="list">
             {practiceAreas.map((area, index) => (
-              <motion.div
+              <motion.li
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card hover clickable className="p-6 h-full">
+                <Card
+                  hover
+                  clickable
+                  className="p-6 h-full"
+                  aria-label={`Learn more about ${area.title}`}
+                  role="article"
+                >
                   <div className="text-center">
-                    <div className="w-16 h-16 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-navy-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                       <area.icon className="w-8 h-8 text-navy-800" />
                     </div>
                     <h3 className="text-xl font-semibold text-navy-800 mb-3">
@@ -201,18 +208,19 @@ const Home: React.FC = () => {
                     <p className="text-gray-600 mb-4">
                       {area.description}
                     </p>
-                    <Link 
+                    <Link
                       to={`/practice-areas/${area.slug}`}
-                      className="text-gold-600 hover:text-gold-700 font-medium inline-flex items-center"
+                      className="text-gold-600 hover:text-gold-700 font-medium inline-flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded"
+                      aria-label={`Learn more about ${area.title} legal services`}
                     >
                       Learn More
-                      <ArrowRight className="w-4 h-4 ml-1" />
+                      <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
                     </Link>
                   </div>
                 </Card>
-              </motion.div>
+              </motion.li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
@@ -330,7 +338,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 };
 

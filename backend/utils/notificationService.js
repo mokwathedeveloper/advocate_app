@@ -135,6 +135,90 @@ const emailTemplates = {
         <p>Best regards,<br>The LegalPro Team</p>
       </div>
     `
+  }),
+
+  // Appointment-related templates
+  appointmentConfirmation: (name, title, date, time, advocateName, location) => ({
+    subject: 'Appointment Confirmed - LegalPro',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #3b82f6;">Appointment Confirmed</h2>
+        <p>Dear ${name},</p>
+        <p>Your appointment has been successfully scheduled:</p>
+        <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <p><strong>Title:</strong> ${title}</p>
+          <p><strong>Date:</strong> ${date}</p>
+          <p><strong>Time:</strong> ${time}</p>
+          <p><strong>With:</strong> ${advocateName}</p>
+          <p><strong>Location:</strong> ${location}</p>
+        </div>
+        <p>Please arrive 10 minutes early for your appointment.</p>
+        <p>If you need to reschedule or cancel, please contact us at least 24 hours in advance.</p>
+        <p>Best regards,<br>LegalPro Team</p>
+      </div>
+    `
+  }),
+
+  appointmentScheduled: (name, title, date, time, clientName, location) => ({
+    subject: 'New Appointment Scheduled - LegalPro',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #3b82f6;">New Appointment Scheduled</h2>
+        <p>Dear ${name},</p>
+        <p>A new appointment has been scheduled with you:</p>
+        <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <p><strong>Title:</strong> ${title}</p>
+          <p><strong>Date:</strong> ${date}</p>
+          <p><strong>Time:</strong> ${time}</p>
+          <p><strong>Client:</strong> ${clientName}</p>
+          <p><strong>Location:</strong> ${location}</p>
+        </div>
+        <p>Please review your calendar and prepare for the meeting.</p>
+        <p>Best regards,<br>LegalPro Team</p>
+      </div>
+    `
+  }),
+
+  appointmentReminder: (name, title, date, time, advocateName, location, hoursAhead) => ({
+    subject: `Appointment Reminder - ${hoursAhead}h Notice - LegalPro`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #f59e0b;">Appointment Reminder</h2>
+        <p>Dear ${name},</p>
+        <p>This is a reminder that you have an appointment in ${hoursAhead} hours:</p>
+        <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+          <p><strong>Title:</strong> ${title}</p>
+          <p><strong>Date:</strong> ${date}</p>
+          <p><strong>Time:</strong> ${time}</p>
+          <p><strong>With:</strong> ${advocateName}</p>
+          <p><strong>Location:</strong> ${location}</p>
+        </div>
+        <p>Please arrive 10 minutes early for your appointment.</p>
+        <p>If you need to reschedule or cancel, please contact us immediately.</p>
+        <p>Best regards,<br>LegalPro Team</p>
+      </div>
+    `
+  }),
+
+  appointmentCancelled: (name, title, date, time, reason, cancelledBy) => ({
+    subject: 'Appointment Cancelled - LegalPro',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #ef4444;">Appointment Cancelled</h2>
+        <p>Dear ${name},</p>
+        <p>Your appointment has been cancelled:</p>
+        <div style="background: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444;">
+          <p><strong>Title:</strong> ${title}</p>
+          <p><strong>Date:</strong> ${date}</p>
+          <p><strong>Time:</strong> ${time}</p>
+          <p><strong>Cancelled by:</strong> ${cancelledBy}</p>
+          <p><strong>Reason:</strong> ${reason}</p>
+        </div>
+        <p>If you would like to reschedule, please contact us to book a new appointment.</p>
+        <p>We apologize for any inconvenience caused.</p>
+        <p>Best regards,<br>LegalPro Team</p>
+      </div>
+    `
   })
 };
 

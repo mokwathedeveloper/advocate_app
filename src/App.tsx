@@ -17,7 +17,7 @@ import Resources from './pages/Resources';
 import Locations from './pages/Locations';
 import NotFound from './pages/NotFound';
 import Cases from './pages/Cases';
-import Appointments from './pages/Appointments';
+import AppointmentDashboard from './pages/appointments/AppointmentDashboard';
 import Messages from './pages/Messages';
 import WhatsAppWidget from './components/whatsapp/WhatsAppWidget';
 
@@ -130,7 +130,7 @@ function App() {
               path="appointments"
               element={
                 <ProtectedRoute>
-                  <Appointments />
+                  <AppointmentDashboard />
                 </ProtectedRoute>
               }
             />

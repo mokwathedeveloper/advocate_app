@@ -28,12 +28,3 @@ dist-ssr
 *.sln
 *.sw?
 .env
-
-# Test coverage reports
-coverage/
-backend/coverage/
-src/coverage/
-
-# Test results
-test-results/
-*.coverage

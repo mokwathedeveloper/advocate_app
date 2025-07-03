@@ -1,12 +1,13 @@
-// Reusable Button component for LegalPro v1.0.1
+// Reusable Button component for LegalPro v1.0.1 - Mobile-First Responsive Design
 import React from 'react';
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   loading?: boolean;
+  fullWidth?: boolean;
   children: React.ReactNode;
 }
 
@@ -14,48 +15,68 @@ const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   size = 'md',
   loading = false,
+  fullWidth = false,
   children,
   className,
   disabled,
   ...props
 }) => {
-  const baseClasses = "inline-flex items-center justify-center font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2";
-  
+  const baseClasses = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed";
+
   const variants = {
-    primary: "bg-navy-800 text-white hover:bg-navy-700 focus:ring-navy-500 disabled:bg-gray-400",
-    secondary: "bg-gold-500 text-white hover:bg-gold-600 focus:ring-gold-400 disabled:bg-gray-400",
-    outline: "border-2 border-navy-800 text-navy-800 hover:bg-navy-800 hover:text-white focus:ring-navy-500 disabled:border-gray-400 disabled:text-gray-400",
-    ghost: "text-navy-800 hover:bg-navy-100 focus:ring-navy-500 disabled:text-gray-400"
+    primary: "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus:ring-primary-500 disabled:bg-neutral-400 disabled:text-neutral-50 shadow-sm hover:shadow-md",
+    secondary: "bg-secondary-500 text-white hover:bg-secondary-600 active:bg-secondary-700 focus:ring-secondary-400 disabled:bg-neutral-400 disabled:text-neutral-50 shadow-sm hover:shadow-md",
+    outline: "border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white active:bg-primary-700 focus:ring-primary-500 disabled:border-neutral-300 disabled:text-neutral-400 disabled:hover:bg-transparent disabled:hover:text-neutral-400",
+    ghost: "text-primary-600 hover:bg-primary-50 active:bg-primary-100 focus:ring-primary-500 disabled:text-neutral-400 disabled:hover:bg-transparent"
   };
 
+  // Mobile-first responsive sizing with touch-friendly targets
   const sizes = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-base",
-    lg: "px-6 py-3 text-lg"
+    sm: "px-3 py-2 text-sm font-medium min-h-touch-target",
+    md: "px-4 py-2.5 text-sm font-medium min-h-touch-target sm:px-5 sm:py-3 sm:text-base",
+    lg: "px-5 py-3 text-base font-medium min-h-touch-target-lg sm:px-6 sm:py-3.5 sm:text-lg",
+    xl: "px-6 py-4 text-lg font-semibold min-h-touch-target-lg sm:px-8 sm:py-4 sm:text-xl"
   };
 
   const classes = clsx(
     baseClasses,
     variants[variant],
     sizes[size],
+    fullWidth ? "w-full" : "w-auto",
     className
   );
 
   return (
     <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={disabled || loading ? {} : { scale: 1.02 }}
+      whileTap={disabled || loading ? {} : { scale: 0.98 }}
       className={classes}
       disabled={disabled || loading}
       {...props}
     >
       {loading && (
-        <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        <svg
+          className="animate-spin -ml-1 mr-2 h-4 w-4 sm:h-5 sm:w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          />
         </svg>
       )}
-      {children}
+      <span className={loading ? "opacity-75" : ""}>{children}</span>
     </motion.button>
   );
 };

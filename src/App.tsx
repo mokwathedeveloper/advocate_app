@@ -1,8 +1,10 @@
-// Main App component for LegalPro v1.0.1
-import React from 'react';
+// Main App component for LegalPro v1.0.1 - WCAG 2.1 AA Compliant
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
+import { SkipLinks, LiveRegion, AccessibleErrorBoundary } from './components/accessibility/AccessibilityComponents';
+import { useLiveRegion } from './hooks/useAccessibility';
 import Home from './pages/Home';
 import About from './pages/About';
 import Dashboard from './pages/Dashboard';
@@ -64,8 +66,11 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <AccessibleErrorBoundary>
+      <AuthProvider>
+        <Router>
+          {/* Skip Links for Keyboard Navigation */}
+          <SkipLinks />
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Layout />}>
@@ -170,8 +175,19 @@ function App() {
           message="Hello! I need legal assistance from LegalPro."
           position="bottom-right"
         />
+
+        {/* Live Region for Screen Reader Announcements */}
+        <div id="live-region-container">
+          <LiveRegion message="" priority="polite" />
+        </div>
+
+        {/* External Link Description for Screen Readers */}
+        <div id="external-link-description" className="sr-only">
+          Opens in a new tab
+        </div>
       </Router>
     </AuthProvider>
+    </AccessibleErrorBoundary>
   );
 }
 

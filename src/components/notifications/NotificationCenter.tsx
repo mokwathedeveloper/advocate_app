@@ -108,7 +108,7 @@ const NotificationCenter: React.FC = () => {
       {/* Notification Bell */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-navy-800 transition-colors"
+        className="relative p-2 text-neutral-600 hover:text-primary-800 transition-colors"
       >
         <Bell className="w-6 h-6" />
         {unreadCount > 0 && (

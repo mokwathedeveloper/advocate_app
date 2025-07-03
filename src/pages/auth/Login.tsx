@@ -35,24 +35,25 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="max-w-md w-full"
       >
-        <Card className="p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-navy-800 mb-2">Welcome to LegalPro</h2>
-            <p className="text-gray-600">Advocate • Admin • Client Login</p>
+        <Card padding="lg">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="heading-section text-primary-800 mb-2">Welcome to LegalPro</h2>
+            <p className="text-sm sm:text-base text-neutral-600">Advocate • Admin • Client Login</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="component-spacing">
             <Input
               label="Email Address"
               type="email"
-              icon={<Mail className="w-5 h-5 text-gray-400" />}
+              inputSize="lg"
+              icon={<Mail className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-400" />}
               error={errors.email?.message}
               {...register('email', {
                 required: 'Email is required',
@@ -67,7 +68,8 @@ const Login: React.FC = () => {
               <Input
                 label="Password"
                 type={showPassword ? 'text' : 'password'}
-                icon={<Lock className="w-5 h-5 text-gray-400" />}
+                inputSize="lg"
+                icon={<Lock className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-400" />}
                 error={errors.password?.message}
                 {...register('password', {
                   required: 'Password is required',
@@ -79,29 +81,29 @@ const Login: React.FC = () => {
               />
               <button
                 type="button"
-                className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-9 sm:top-10 text-neutral-400 hover:text-neutral-600 touch-target"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
               <div className="flex items-center">
                 <input
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-navy-800 focus:ring-navy-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-primary-800 focus:ring-primary-500 border-neutral-300 rounded"
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                <label htmlFor="remember-me" className="ml-2 block text-sm sm:text-base text-neutral-900">
                   Remember me
                 </label>
               </div>
 
               <Link
                 to="/forgot-password"
-                className="text-sm text-navy-800 hover:text-navy-600"
+                className="text-sm sm:text-base text-primary-800 hover:text-primary-600 font-medium"
               >
                 Forgot your password?
               </Link>
@@ -109,7 +111,8 @@ const Login: React.FC = () => {
 
             <Button
               type="submit"
-              className="w-full"
+              size="lg"
+              fullWidth
               loading={loading}
               disabled={loading}
             >

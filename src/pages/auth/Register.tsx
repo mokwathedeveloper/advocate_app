@@ -1,9 +1,13 @@
-// Registration page component for LegalPro v1.0.1
-import React, { useState } from 'react';
+// Professional Registration page component for LegalPro v1.0.1
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { Mail, Lock, User, Phone, Eye, EyeOff, Scale, GraduationCap, Award, FileText, Key, CheckCircle } from 'lucide-react';
+import {
+  Mail, Lock, User, Phone, Eye, EyeOff, Scale, GraduationCap,
+  Award, FileText, Key, CheckCircle, AlertCircle, Shield,
+  Clock, UserCheck, Building, Calendar
+} from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { RegisterData } from '../../types';
 import Button from '../../components/ui/Button';
@@ -13,15 +17,39 @@ import toast from 'react-hot-toast';
 
 interface RegisterFormData extends RegisterData {
   confirmPassword: string;
+  superKey: string;
+}
+
+interface ValidationError {
+  field: string;
+  message: string;
+}
+
+interface PasswordStrength {
+  score: number;
+  feedback: string[];
+  isValid: boolean;
 }
 
 const Register: React.FC = () => {
+  // UI State
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showSuperKey, setShowSuperKey] = useState(false);
   const [selectedRole, setSelectedRole] = useState<'advocate'>('advocate');
+
+  // Validation State
   const [superKeyVerified, setSuperKeyVerified] = useState(false);
   const [superKeyInput, setSuperKeyInput] = useState('');
+  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
+    score: 0,
+    feedback: [],
+    isValid: false
+  });
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Hooks
   const { register: registerUser, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -29,24 +57,149 @@ const Register: React.FC = () => {
     register,
     handleSubmit,
     watch,
-    formState: { errors }
-  } = useForm<RegisterFormData>();
+    formState: { errors },
+    clearErrors,
+    setError
+  } = useForm<RegisterFormData>({
+    mode: 'onChange'
+  });
 
   const password = watch('password');
+  const confirmPassword = watch('confirmPassword');
 
-  // Super key for advocate registration (in production, this should be environment variable)
-  const SUPER_KEY = 'ADVOCATE_MASTER_2024_LEGALPRO';
+  // Super key for advocate registration
+  const SUPER_KEY = 'ADVOCATE-SUPER-2024-DEV-KEY';
 
+  // Password strength validation
+  const validatePasswordStrength = (password: string): PasswordStrength => {
+    if (!password) {
+      return { score: 0, feedback: [], isValid: false };
+    }
+
+    const feedback: string[] = [];
+    let score = 0;
+
+    // Length check
+    if (password.length >= 8) {
+      score += 1;
+    } else {
+      feedback.push('At least 8 characters');
+    }
+
+    // Uppercase check
+    if (/[A-Z]/.test(password)) {
+      score += 1;
+    } else {
+      feedback.push('One uppercase letter');
+    }
+
+    // Lowercase check
+    if (/[a-z]/.test(password)) {
+      score += 1;
+    } else {
+      feedback.push('One lowercase letter');
+    }
+
+    // Number check
+    if (/\d/.test(password)) {
+      score += 1;
+    } else {
+      feedback.push('One number');
+    }
+
+    // Special character check
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      score += 1;
+    } else {
+      feedback.push('One special character');
+    }
+
+    return {
+      score,
+      feedback,
+      isValid: score >= 4
+    };
+  };
+
+  // Real-time password validation
+  useEffect(() => {
+    if (password) {
+      const strength = validatePasswordStrength(password);
+      setPasswordStrength(strength);
+    }
+  }, [password]);
+
+  // Super key verification with enhanced security
   const verifySuperKey = (key: string) => {
+    if (!key) {
+      setSuperKeyVerified(false);
+      return;
+    }
+
     if (key === SUPER_KEY) {
       setSuperKeyVerified(true);
-      toast.success('Super key verified! You can now complete advocate registration.');
+      toast.success('✅ Super key verified! You can now complete advocate registration.');
     } else {
       setSuperKeyVerified(false);
       if (key.length > 0) {
-        toast.error('Invalid super key. Contact system administrator.');
+        toast.error('❌ Invalid super key. Contact system administrator.');
       }
     }
+  };
+
+  // Enhanced form validation
+  const validateForm = (data: RegisterFormData): ValidationError[] => {
+    const errors: ValidationError[] = [];
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      errors.push({ field: 'email', message: 'Please enter a valid email address' });
+    }
+
+    // Password confirmation
+    if (data.password !== data.confirmPassword) {
+      errors.push({ field: 'confirmPassword', message: 'Passwords do not match' });
+    }
+
+    // Password strength
+    if (!passwordStrength.isValid) {
+      errors.push({ field: 'password', message: 'Password does not meet security requirements' });
+    }
+
+    // Phone validation (optional but if provided, must be valid)
+    if (data.phone && !/^\+?[\d\s\-\(\)]+$/.test(data.phone)) {
+      errors.push({ field: 'phone', message: 'Please enter a valid phone number' });
+    }
+
+    // Advocate-specific validation
+    if (selectedRole === 'advocate') {
+      if (!superKeyVerified) {
+        errors.push({ field: 'superKey', message: 'Please verify the super key first' });
+      }
+
+      if (!data.licenseNumber || data.licenseNumber.trim().length < 3) {
+        errors.push({ field: 'licenseNumber', message: 'License number must be at least 3 characters' });
+      }
+
+      if (!data.specialization) {
+        errors.push({ field: 'specialization', message: 'Please select a specialization' });
+      }
+
+      if (!data.experience || data.experience.trim().length < 10) {
+        errors.push({ field: 'experience', message: 'Please provide detailed experience (minimum 10 characters)' });
+      }
+
+      if (!data.education || data.education.trim().length < 10) {
+        errors.push({ field: 'education', message: 'Please provide detailed education information (minimum 10 characters)' });
+      }
+
+      if (!data.barAdmission || data.barAdmission.trim().length < 5) {
+        errors.push({ field: 'barAdmission', message: 'Please provide bar admission details (minimum 5 characters)' });
+      }
+    }
+
+    return errors;
   };
 
   const specializations = [
@@ -62,20 +215,158 @@ const Register: React.FC = () => {
     'Environmental Law'
   ];
 
+  // Enhanced form submission with comprehensive validation
   const onSubmit = async (data: RegisterFormData) => {
-    if (!superKeyVerified) {
-      toast.error('Please verify the super key first');
-      return;
-    }
+    setIsSubmitting(true);
+    setValidationErrors([]);
 
     try {
+      // Client-side validation
+      const clientErrors = validateForm(data);
+      if (clientErrors.length > 0) {
+        setValidationErrors(clientErrors);
+
+        // Set form errors for individual fields
+        clientErrors.forEach(error => {
+          setError(error.field as keyof RegisterFormData, {
+            type: 'manual',
+            message: error.message
+          });
+        });
+
+        toast.error('Please fix the validation errors before submitting');
+        return;
+      }
+
+      // Prepare submission data
       const { confirmPassword, ...userData } = data;
       userData.role = 'advocate'; // Only advocates can register directly
-      await registerUser(userData);
-      navigate('/dashboard');
-    } catch (error) {
-      // Error handling is done in the AuthContext
+      userData.superKey = superKeyInput; // Include super key for backend verification
+
+      console.log('Submitting registration data:', {
+        email: userData.email,
+        role: userData.role,
+        licenseNumber: userData.licenseNumber
+      });
+
+      // Submit registration
+      const result = await registerUser(userData);
+
+      // Success feedback
+      toast.success('🎉 Registration successful! Please verify your email.');
+
+      // Store email for verification page
+      localStorage.setItem('pendingVerificationEmail', userData.email);
+
+      // Navigate to email verification
+      setTimeout(() => {
+        navigate('/verify-email');
+      }, 1000);
+
+    } catch (error: any) {
+      console.error('Registration error:', error);
+
+      // Handle server validation errors
+      if (error.message && error.message.includes('Validation failed')) {
+        try {
+          const errorData = JSON.parse(error.message.split('Validation failed: ')[1]);
+          if (errorData.errors) {
+            setValidationErrors(errorData.errors);
+            errorData.errors.forEach((err: ValidationError) => {
+              setError(err.field as keyof RegisterFormData, {
+                type: 'server',
+                message: err.message
+              });
+            });
+          }
+        } catch (parseError) {
+          toast.error('Registration failed. Please check your information and try again.');
+        }
+      } else {
+        toast.error(error.message || 'Registration failed. Please try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  // Password Strength Indicator Component
+  const PasswordStrengthIndicator: React.FC<{ strength: PasswordStrength }> = ({ strength }) => {
+    const getStrengthColor = (score: number) => {
+      if (score < 2) return 'bg-red-500';
+      if (score < 3) return 'bg-yellow-500';
+      if (score < 4) return 'bg-blue-500';
+      return 'bg-green-500';
+    };
+
+    const getStrengthText = (score: number) => {
+      if (score < 2) return 'Weak';
+      if (score < 3) return 'Fair';
+      if (score < 4) return 'Good';
+      return 'Strong';
+    };
+
+    return (
+      <div className="mt-2">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs font-medium text-gray-700">Password Strength</span>
+          <span className={`text-xs font-medium ${
+            strength.score < 2 ? 'text-red-600' :
+            strength.score < 3 ? 'text-yellow-600' :
+            strength.score < 4 ? 'text-blue-600' : 'text-green-600'
+          }`}>
+            {getStrengthText(strength.score)}
+          </span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div
+            className={`h-2 rounded-full transition-all duration-300 ${getStrengthColor(strength.score)}`}
+            style={{ width: `${(strength.score / 5) * 100}%` }}
+          ></div>
+        </div>
+        {strength.feedback.length > 0 && (
+          <div className="mt-2">
+            <p className="text-xs text-gray-600 mb-1">Password must include:</p>
+            <ul className="text-xs text-gray-500 space-y-1">
+              {strength.feedback.map((item, index) => (
+                <li key={index} className="flex items-center space-x-1">
+                  <AlertCircle className="w-3 h-3 text-red-400" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Validation Error Display Component
+  const ValidationErrorDisplay: React.FC<{ errors: ValidationError[] }> = ({ errors }) => {
+    if (errors.length === 0) return null;
+
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md"
+        >
+          <div className="flex items-start space-x-2">
+            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <h4 className="text-sm font-medium text-red-800 mb-2">Please fix the following errors:</h4>
+              <ul className="text-sm text-red-700 space-y-1">
+                {errors.map((error, index) => (
+                  <li key={index}>• {error.message}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    );
   };
 
   return (
@@ -175,6 +466,9 @@ const Register: React.FC = () => {
 
           {superKeyVerified && (
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {/* Validation Errors Display */}
+              <ValidationErrorDisplay errors={validationErrors} />
+
               {/* Basic Information */}
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -296,6 +590,11 @@ const Register: React.FC = () => {
 
             {/* Password fields */}
             <div className="space-y-4 border-t pt-6">
+              <h3 className="text-lg font-medium text-navy-800 mb-4 flex items-center space-x-2">
+                <Shield className="w-5 h-5" />
+                <span>Security Information</span>
+              </h3>
+
               <div className="relative">
                 <Input
                   label="Password"
@@ -308,9 +607,9 @@ const Register: React.FC = () => {
                       value: 8,
                       message: 'Password must be at least 8 characters'
                     },
-                    pattern: {
-                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                      message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+                    validate: (value) => {
+                      const strength = validatePasswordStrength(value);
+                      return strength.isValid || 'Password does not meet security requirements';
                     }
                   })}
                 />
@@ -321,6 +620,9 @@ const Register: React.FC = () => {
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
+
+                {/* Password Strength Indicator */}
+                {password && <PasswordStrengthIndicator strength={passwordStrength} />}
               </div>
 
               <div className="relative">
@@ -370,14 +672,45 @@ const Register: React.FC = () => {
               <p className="text-sm text-red-600">{errors.terms.message}</p>
             )}
 
-            <Button
-              type="submit"
-              className="w-full"
-              loading={loading}
-              disabled={loading}
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
             >
-              Register as Advocate (Superuser/Owner)
-            </Button>
+              <Button
+                type="submit"
+                className="w-full bg-navy-800 hover:bg-navy-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 flex items-center justify-center space-x-2"
+                loading={isSubmitting || loading}
+                disabled={isSubmitting || loading || !superKeyVerified}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Clock className="w-5 h-5 animate-spin" />
+                    <span>Creating Account...</span>
+                  </>
+                ) : (
+                  <>
+                    <UserCheck className="w-5 h-5" />
+                    <span>Register as Advocate (Superuser/Owner)</span>
+                  </>
+                )}
+              </Button>
+            </motion.div>
+
+            {/* Registration Progress Indicator */}
+            {isSubmitting && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md"
+              >
+                <div className="flex items-center space-x-2">
+                  <Clock className="w-4 h-4 text-blue-600 animate-spin" />
+                  <p className="text-sm text-blue-800">
+                    Processing your registration... Please wait.
+                  </p>
+                </div>
+              </motion.div>
+            )}
           </form>
           )}
 

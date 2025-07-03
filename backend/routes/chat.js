@@ -3,17 +3,9 @@ const express = require('express');
 const router = express.Router();
 const chatController = require('../controllers/chatController');
 const { protect } = require('../middleware/auth');
-const { rateLimiter } = require('../middleware/rateLimiter');
 
 // Apply authentication to all routes
 router.use(protect);
-
-// Apply rate limiting
-router.use(rateLimiter({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // Limit each IP to 200 requests per windowMs
-  message: 'Too many chat requests from this IP, please try again later.'
-}));
 
 // Conversation routes
 router.get('/conversations', chatController.getConversations);

@@ -1,6 +1,20 @@
 // Chat Service for Real-time Chat System - LegalPro v1.0.1
 import { io, Socket } from 'socket.io-client';
-import { apiRequest } from './api';
+import axios from 'axios';
+
+// Create axios instance for chat API calls
+const chatApi = axios.create({
+  baseURL: process.env.REACT_APP_SERVER_URL || 'http://localhost:5000',
+});
+
+// Add auth token to requests
+chatApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 // Types
 export interface User {
@@ -145,7 +159,7 @@ export const SOCKET_EVENTS = {
 
 class ChatService {
   private socket: Socket | null = null;
-  private isConnected = false;
+  private connected = false;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
@@ -176,7 +190,7 @@ class ChatService {
 
       this.socket.on('connect', () => {
         console.log('Connected to chat server');
-        this.isConnected = true;
+        this.connected = true;
         this.reconnectAttempts = 0;
         this.emit('connected');
         resolve();
@@ -184,14 +198,14 @@ class ChatService {
 
       this.socket.on('connect_error', (error) => {
         console.error('Connection error:', error);
-        this.isConnected = false;
+        this.connected = false;
         this.emit('connection_error', error);
         reject(error);
       });
 
       this.socket.on('disconnect', (reason) => {
         console.log('Disconnected from chat server:', reason);
-        this.isConnected = false;
+        this.connected = false;
         this.emit('disconnected', reason);
         
         if (reason === 'io server disconnect') {
@@ -208,7 +222,7 @@ class ChatService {
     if (this.socket) {
       this.socket.disconnect();
       this.socket = null;
-      this.isConnected = false;
+      this.connected = false;
     }
   }
 
@@ -403,17 +417,12 @@ class ChatService {
     search?: string;
     caseId?: string;
   } = {}): Promise<{ data: Conversation[]; pagination: any }> {
-    const response = await apiRequest('/api/chat/conversations', {
-      method: 'GET',
-      params
-    });
-    return response;
+    const response = await chatApi.get('/api/chat/conversations', { params });
+    return response.data;
   }
 
   async getConversation(conversationId: string): Promise<Conversation> {
-    const response = await apiRequest(`/api/chat/conversations/${conversationId}`, {
-      method: 'GET'
-    });
+    const response = await chatApi.get(`/api/chat/conversations/${conversationId}`);
     return response.data;
   }
 
@@ -424,10 +433,7 @@ class ChatService {
     description?: string;
     caseId?: string;
   }): Promise<Conversation> {
-    const response = await apiRequest('/api/chat/conversations', {
-      method: 'POST',
-      data: conversationData
-    });
+    const response = await chatApi.post('/api/chat/conversations', conversationData);
     return response.data;
   }
 
@@ -438,33 +444,27 @@ class ChatService {
     after?: string;
     search?: string;
   } = {}): Promise<{ data: Message[]; pagination: any }> {
-    const response = await apiRequest(`/api/chat/conversations/${conversationId}/messages`, {
-      method: 'GET',
-      params
-    });
-    return response;
+    const response = await chatApi.get(`/api/chat/conversations/${conversationId}/messages`, { params });
+    return response.data;
   }
 
   async searchUsers(query: string, options: {
     limit?: number;
     exclude?: string[];
   } = {}): Promise<User[]> {
-    const response = await apiRequest('/api/chat/users/search', {
-      method: 'GET',
+    const response = await chatApi.get('/api/chat/users/search', {
       params: { query, ...options }
     });
     return response.data;
   }
 
   async markConversationAsRead(conversationId: string): Promise<void> {
-    await apiRequest(`/api/chat/conversations/${conversationId}/read`, {
-      method: 'PUT'
-    });
+    await chatApi.put(`/api/chat/conversations/${conversationId}/read`);
   }
 
   // Utility methods
   isConnected(): boolean {
-    return this.isConnected && this.socket?.connected === true;
+    return this.connected && this.socket?.connected === true;
   }
 
   getConnectionStatus(): 'connected' | 'disconnected' | 'connecting' | 'reconnecting' {

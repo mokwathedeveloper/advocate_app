@@ -4,7 +4,7 @@ const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
 const { validateCase, validateCaseUpdate } = require('../middleware/validation');
 const caseController = require('../controllers/caseController');
-const upload = require('../middleware/upload');
+const { uploadSingle } = require('../middleware/upload');
 
 // @route   GET /api/cases
 // @desc    Get all cases (filtered by user role)
@@ -34,7 +34,7 @@ router.delete('/:id', protect, authorize('super_admin'), caseController.deleteCa
 // @route   POST /api/cases/:id/documents
 // @desc    Upload case document
 // @access  Private
-router.post('/:id/documents', protect, upload.single('document'), caseController.uploadDocument);
+router.post('/:id/documents', protect, uploadSingle('document'), caseController.uploadDocument);
 
 // @route   POST /api/cases/:id/notes
 // @desc    Add case note

@@ -2,3 +2,454 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Enhanced Toast Animations and Styles for LegalPro v1.0.1 */
+
+/* Toast Container Styles */
+.toast-container {
+  pointer-events: none;
+}
+
+.toast-container > * {
+  pointer-events: auto;
+}
+
+/* Toast Animation Classes */
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toast-leave {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%) scale(0.8);
+  }
+}
+
+.animate-enter {
+  animation: toast-enter 0.3s ease-out forwards;
+}
+
+.animate-leave {
+  animation: toast-leave 0.2s ease-in forwards;
+}
+
+/* Toast Hover Effects */
+.toast-hover:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Progress Bar Animations */
+.toast-progress {
+  transition: width 0.1s linear;
+}
+
+/* Mobile Responsive Toast Styles */
+@media (max-width: 640px) {
+  .toast-container {
+    left: 16px !important;
+    right: 16px !important;
+    top: 16px !important;
+    transform: none !important;
+  }
+
+  .toast-mobile {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  /* Mobile swipe gesture indicator */
+  .toast-swipe-indicator {
+    position: relative;
+  }
+
+  .toast-swipe-indicator::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 1px;
+  }
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  .animate-enter,
+  .animate-leave,
+  .toast-hover:hover {
+    animation: none;
+    transform: none;
+    transition: none;
+  }
+
+  .toast-progress {
+    transition: none;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .toast-container [role="alert"] {
+    border: 2px solid currentColor;
+  }
+
+  .toast-progress {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Focus Indicators for Accessibility */
+.toast-container [role="alert"]:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.toast-container button:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .toast-container [role="alert"] {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* ===== MOBILE RESPONSIVENESS ENHANCEMENTS ===== */
+
+/* Mobile-First Base Styles */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Touch-Friendly Interactive Elements */
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+.clickable {
+  min-height: 44px;
+  min-width: 44px;
+  touch-action: manipulation;
+}
+
+/* Mobile Navigation Enhancements */
+@media (max-width: 768px) {
+  /* Mobile-optimized spacing */
+  .mobile-spacing {
+    padding: 1rem;
+  }
+
+  .mobile-spacing-sm {
+    padding: 0.5rem;
+  }
+
+  .mobile-spacing-lg {
+    padding: 1.5rem;
+  }
+
+  /* Mobile-friendly form elements */
+  input,
+  textarea,
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px 16px;
+    border-radius: 8px;
+  }
+
+  /* Mobile button styles */
+  .btn-mobile {
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+    font-weight: 500;
+  }
+
+  /* Mobile card layouts */
+  .card-mobile {
+    margin: 0.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Mobile table responsiveness */
+  .table-mobile {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobile modal adjustments */
+  .modal-mobile {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    border-radius: 12px 12px 0 0;
+  }
+
+  /* Mobile drawer/sidebar */
+  .drawer-mobile {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .drawer-mobile.open {
+    transform: translateX(0);
+  }
+
+  /* Mobile-optimized text sizes */
+  .text-mobile-xs { font-size: 12px; }
+  .text-mobile-sm { font-size: 14px; }
+  .text-mobile-base { font-size: 16px; }
+  .text-mobile-lg { font-size: 18px; }
+  .text-mobile-xl { font-size: 20px; }
+  .text-mobile-2xl { font-size: 24px; }
+  .text-mobile-3xl { font-size: 30px; }
+
+  /* Mobile grid adjustments */
+  .grid-mobile-1 { grid-template-columns: 1fr; }
+  .grid-mobile-2 { grid-template-columns: repeat(2, 1fr); }
+
+  /* Mobile flex utilities */
+  .flex-mobile-col { flex-direction: column; }
+  .flex-mobile-row { flex-direction: row; }
+
+  /* Mobile spacing utilities */
+  .space-mobile-y-2 > * + * { margin-top: 0.5rem; }
+  .space-mobile-y-4 > * + * { margin-top: 1rem; }
+  .space-mobile-y-6 > * + * { margin-top: 1.5rem; }
+
+  .space-mobile-x-2 > * + * { margin-left: 0.5rem; }
+  .space-mobile-x-4 > * + * { margin-left: 1rem; }
+  .space-mobile-x-6 > * + * { margin-left: 1.5rem; }
+}
+
+/* Tablet Responsiveness (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .tablet-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .tablet-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .tablet-text-sm { font-size: 14px; }
+  .tablet-text-base { font-size: 16px; }
+  .tablet-text-lg { font-size: 18px; }
+
+  .tablet-spacing { padding: 1.5rem; }
+  .tablet-spacing-sm { padding: 1rem; }
+  .tablet-spacing-lg { padding: 2rem; }
+}
+
+/* Large Mobile Devices (414px+) */
+@media (min-width: 414px) and (max-width: 767px) {
+  .large-mobile-grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+  .large-mobile-text-base { font-size: 16px; }
+  .large-mobile-text-lg { font-size: 18px; }
+
+  .large-mobile-spacing { padding: 1.25rem; }
+}
+
+/* Small Mobile Devices (320px - 413px) */
+@media (max-width: 413px) {
+  .small-mobile-text-xs { font-size: 11px; }
+  .small-mobile-text-sm { font-size: 13px; }
+  .small-mobile-text-base { font-size: 15px; }
+
+  .small-mobile-spacing { padding: 0.75rem; }
+  .small-mobile-spacing-sm { padding: 0.5rem; }
+
+  /* Compact button styles for small screens */
+  .btn-compact {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-height: 40px;
+  }
+}
+
+/* Touch Gesture Enhancements */
+.swipe-container {
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+}
+
+.swipe-item {
+  transition: transform 0.2s ease-out;
+}
+
+.swipe-item.swiping {
+  transition: none;
+}
+
+/* Pull-to-refresh styles */
+.pull-to-refresh {
+  position: relative;
+  overflow: hidden;
+}
+
+.pull-to-refresh-indicator {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: top 0.3s ease-out;
+}
+
+.pull-to-refresh.pulling .pull-to-refresh-indicator {
+  top: 20px;
+}
+
+/* Mobile-optimized loading states */
+.mobile-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: mobile-skeleton-loading 1.5s infinite;
+}
+
+@keyframes mobile-skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Mobile-friendly focus states */
+@media (max-width: 768px) {
+  *:focus {
+    outline: 2px solid #3B82F6;
+    outline-offset: 2px;
+  }
+
+  button:focus,
+  [role="button"]:focus {
+    outline: 3px solid #3B82F6;
+    outline-offset: 2px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .landscape-hide { display: none; }
+  .landscape-show { display: block; }
+
+  /* Reduce vertical spacing in landscape */
+  .landscape-compact {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Adjust modal heights for landscape */
+  .modal-landscape {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Safe area adjustments for notched devices */
+@supports (padding: max(0px)) {
+  .safe-area-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .safe-area-left {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+
+  .safe-area-right {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Mobile-optimized animations */
+@media (max-width: 768px) {
+  .mobile-fade-in {
+    animation: mobile-fade-in 0.3s ease-out;
+  }
+
+  .mobile-slide-up {
+    animation: mobile-slide-up 0.3s ease-out;
+  }
+
+  .mobile-slide-down {
+    animation: mobile-slide-down 0.3s ease-out;
+  }
+}
+
+@keyframes mobile-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes mobile-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mobile-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile-specific utility classes */
+.mobile-only { display: none; }
+.desktop-only { display: block; }
+
+@media (max-width: 768px) {
+  .mobile-only { display: block; }
+  .desktop-only { display: none; }
+
+  .mobile-flex { display: flex; }
+  .mobile-grid { display: grid; }
+  .mobile-hidden { display: none; }
+  .mobile-block { display: block; }
+  .mobile-inline { display: inline; }
+  .mobile-inline-block { display: inline-block; }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .high-dpi-border {
+    border-width: 0.5px;
+  }
+
+  .high-dpi-shadow {
+    box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.1);
+  }
+}

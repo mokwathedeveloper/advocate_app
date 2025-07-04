@@ -1,7 +1,11 @@
-// Main App component for LegalPro v1.0.1
+// Enhanced Main App component for LegalPro v1.0.1 - Production Ready
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AccessibilityProvider } from './components/ui/AccessibilityProvider';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
+import AsyncErrorBoundary from './components/ErrorBoundary/AsyncErrorBoundary';
+import MobileNavigation from './components/ui/MobileNavigation';
 import Layout from './components/Layout/Layout';
 import Home from './pages/Home';
 import About from './pages/About';

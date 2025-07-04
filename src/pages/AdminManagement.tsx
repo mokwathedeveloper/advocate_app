@@ -6,29 +6,25 @@ import {
   Shield,
   Plus,
   Search,
-  Filter,
   User,
   Mail,
   Phone,
-  CheckCircle,
-  XCircle,
-  Edit,
   Trash2,
   Eye,
   UserCheck,
   UserX,
   Settings,
   Users,
-  UserPlus,
   Key,
-  Crown
+  Crown,
+  RotateCcw
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
 import UserManagementDashboard from '../components/UserManagement/UserManagementDashboard';
-import toast from 'react-hot-toast';
+import { showToast } from '../services/toastService';
 
 interface AdminFormData {
   firstName: string;
@@ -128,7 +124,7 @@ const AdminManagement: React.FC = () => {
   useEffect(() => {
     // Check if user is advocate (super admin)
     if (user?.role !== 'advocate') {
-      toast.error('Access denied. Only advocates can manage admins.');
+      showToast.error('Access denied. Only advocates can manage admins.');
       return;
     }
 
@@ -140,10 +136,17 @@ const AdminManagement: React.FC = () => {
   }, [user]);
 
   const onSubmit = async (data: AdminFormData) => {
+    const loadingToastId = showToast.loading('Creating admin account...', {
+      title: 'Creating Admin'
+    });
+
     try {
       // API call to create admin
       console.log('Creating admin:', data);
-      
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
       const newAdmin: Admin = {
         id: Date.now().toString(),
         ...data,
@@ -155,24 +158,88 @@ const AdminManagement: React.FC = () => {
       };
 
       setAdmins([...admins, newAdmin]);
-      toast.success('Admin created successfully!');
+
+      showToast.dismiss(loadingToastId);
+      showToast.success(`Admin account created for ${data.firstName} ${data.lastName}. Login credentials have been sent via email.`, {
+        title: 'Admin Created Successfully',
+        actions: [
+          {
+            label: 'Send Welcome Email',
+            action: () => {
+              showToast.info('Welcome email sent successfully.', {
+                title: 'Email Sent'
+              });
+            },
+            icon: Mail
+          },
+          {
+            label: 'Set Permissions',
+            action: () => console.log('Set permissions'),
+            icon: Key
+          }
+        ]
+      });
+
       reset();
       setShowCreateForm(false);
-    } catch (error) {
-      toast.error('Failed to create admin');
+    } catch (error: any) {
+      showToast.dismiss(loadingToastId);
+      showToast.error(error.message || 'Failed to create admin account. Please check the information and try again.', {
+        title: 'Admin Creation Failed',
+        actions: [
+          {
+            label: 'Retry',
+            action: () => onSubmit(data),
+            icon: RotateCcw
+          }
+        ]
+      });
     }
   };
 
   const toggleAdminStatus = async (adminId: string) => {
+    const admin = admins.find(a => a.id === adminId);
+    if (!admin) return;
+
+    const action = admin.isActive ? 'deactivating' : 'activating';
+    const loadingToastId = showToast.loading(`${action} admin account...`, {
+      title: 'Updating Status'
+    });
+
     try {
-      setAdmins(admins.map(admin => 
-        admin.id === adminId 
-          ? { ...admin, isActive: !admin.isActive }
-          : admin
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      setAdmins(admins.map(a =>
+        a.id === adminId
+          ? { ...a, isActive: !a.isActive }
+          : a
       ));
-      toast.success('Admin status updated successfully!');
-    } catch (error) {
-      toast.error('Failed to update admin status');
+
+      showToast.dismiss(loadingToastId);
+      showToast.success(`Admin account ${admin.isActive ? 'deactivated' : 'activated'} successfully.`, {
+        title: 'Status Updated',
+        actions: [
+          {
+            label: admin.isActive ? 'Reactivate' : 'Deactivate',
+            action: () => toggleAdminStatus(adminId),
+            icon: admin.isActive ? UserCheck : UserX,
+            variant: admin.isActive ? 'primary' : 'danger'
+          }
+        ]
+      });
+    } catch (error: any) {
+      showToast.dismiss(loadingToastId);
+      showToast.error(error.message || 'Failed to update admin status. Please try again.', {
+        title: 'Status Update Failed',
+        actions: [
+          {
+            label: 'Retry',
+            action: () => toggleAdminStatus(adminId),
+            icon: RotateCcw
+          }
+        ]
+      });
     }
   };
 
@@ -180,9 +247,9 @@ const AdminManagement: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this admin? This action cannot be undone.')) {
       try {
         setAdmins(admins.filter(admin => admin.id !== adminId));
-        toast.success('Admin deleted successfully!');
+        showToast.success('Admin deleted successfully!');
       } catch (error) {
-        toast.error('Failed to delete admin');
+        showToast.error('Failed to delete admin');
       }
     }
   };

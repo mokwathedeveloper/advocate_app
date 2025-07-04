@@ -1,15 +1,15 @@
-// Cases management page for LegalPro v1.0.1
+// Enhanced Cases management page for LegalPro v1.0.1 - With Loading & Error Handling
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { 
-  FileText, 
-  Plus, 
-  Search, 
-  Filter, 
-  Calendar, 
-  User, 
-  Clock, 
+import {
+  FileText,
+  Plus,
+  Search,
+  Filter,
+  Calendar,
+  User,
+  Clock,
   AlertCircle,
   CheckCircle,
   Upload,
@@ -19,12 +19,17 @@ import {
   Trash2,
   Eye,
   Tag,
-  Flag
+  Flag,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useApi, useFormSubmission } from '../hooks/useApi';
+import { apiService } from '../services/apiService';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
+import { LoadingOverlay, SkeletonCard, SkeletonTable } from '../components/ui/LoadingStates';
+import { ErrorBoundary, InlineError } from '../components/ui/ErrorHandling';
 import toast from 'react-hot-toast';
 
 interface CaseFormData {
@@ -37,13 +42,33 @@ interface CaseFormData {
 
 const Cases: React.FC = () => {
   const { user } = useAuth();
-  const [cases, setCases] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedCase, setSelectedCase] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [priorityFilter, setPriorityFilter] = useState('all');
-  const [loading, setLoading] = useState(true);
+
+  // API hooks for cases data
+  const {
+    data: cases,
+    loading: casesLoading,
+    error: casesError,
+    retry: retryCases
+  } = useApi(
+    () => apiService.getCases({
+      search: searchTerm,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      priority: priorityFilter !== 'all' ? priorityFilter : undefined
+    }),
+    [searchTerm, statusFilter, priorityFilter]
+  );
+
+  // Form submission hook
+  const {
+    loading: submitting,
+    error: submitError,
+    submit: submitCase
+  } = useFormSubmission();
 
   const {
     register,

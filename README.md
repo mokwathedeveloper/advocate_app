@@ -13,7 +13,7 @@ A comprehensive case management system designed specifically for legal professio
 - **Client Portal**: Secure client access to case information and updates
 - **Appointment Scheduling**: Integrated calendar with automated reminders
 - **Document Management**: Secure file upload, storage, and sharing
-- **Payment Integration**: M-Pesa and card payment processing
+- **Payment Integration**: Comprehensive M-Pesa Daraja API integration with STK Push, B2C refunds, and transaction tracking
 - **Real-time Communication**: Built-in messaging system
 - **Reporting & Analytics**: Comprehensive case and financial reporting
 
@@ -21,7 +21,7 @@ A comprehensive case management system designed specifically for legal professio
 - **Dashboard**: Overview of all cases and appointments
 - **Case Tracking**: Real-time updates on case progress
 - **Document Access**: Secure access to case-related documents
-- **Online Payments**: Easy fee payment with multiple options
+- **Online Payments**: Seamless M-Pesa payments with real-time status updates
 - **Appointment Booking**: Self-service appointment scheduling
 - **Communication**: Direct messaging with legal team
 
@@ -42,6 +42,7 @@ A comprehensive case management system designed specifically for legal professio
 - **Socket.io** for real-time communication
 - **Cloudinary** for file storage
 - **Nodemailer** for email notifications
+- **M-Pesa Daraja API** for payment processing
 
 ### DevOps & Tools
 - **GitHub Actions** for CI/CD
@@ -199,6 +200,44 @@ We use a feature-branch workflow. Use the provided scripts for common operations
 ./scripts/git-workflow.sh tag 1.1.0 "New features and bug fixes"
 ```
 
+## 💳 M-Pesa Payment Integration
+
+LegalPro features a comprehensive M-Pesa Daraja API integration for seamless payment processing in the Kenyan market.
+
+### Features
+- **STK Push Payments**: Direct payment requests to customer phones
+- **Real-time Status Updates**: Live payment status tracking with auto-refresh
+- **B2C Refunds**: Automated refund processing for administrators
+- **Transaction Logging**: Comprehensive audit trail for all transactions
+- **Multi-step Payment UI**: Professional payment flow with progress indicators
+- **Retry Mechanisms**: Automatic retry for failed transactions
+
+### Configuration
+```env
+# M-Pesa Configuration
+MPESA_ENVIRONMENT=sandbox
+MPESA_CONSUMER_KEY=your_consumer_key
+MPESA_CONSUMER_SECRET=your_consumer_secret
+MPESA_SHORTCODE=174379
+MPESA_PASSKEY=your_passkey
+MPESA_STK_CALLBACK_URL=https://yourdomain.com/api/payments/mpesa/stk-callback
+```
+
+### Usage
+```typescript
+// Initiate payment
+import { PaymentModal } from './components/payments';
+
+<PaymentModal
+  defaultAmount={1000}
+  defaultPaymentType="consultation_fee"
+  onPaymentSuccess={(paymentId) => handleSuccess(paymentId)}
+  onClose={() => setShowModal(false)}
+/>
+```
+
+For detailed integration guide, see [MPESA_INTEGRATION_GUIDE.md](./MPESA_INTEGRATION_GUIDE.md)
+
 ## 🧪 Testing
 
 ### Frontend Testing
@@ -212,8 +251,19 @@ npm run test:watch         # Run tests in watch mode
 ```bash
 cd backend
 npm test                   # Run all tests
+npm test mpesa.test.js     # Run M-Pesa specific tests
 npm run test:integration   # Run integration tests
 npm run test:unit         # Run unit tests
+```
+
+### M-Pesa Testing
+```bash
+# Run M-Pesa integration tests
+cd backend
+npm test mpesa.test.js
+
+# Manual testing with sandbox
+# See MPESA_INTEGRATION_SPECS.md for detailed testing procedures
 ```
 
 ## 🚀 Deployment
@@ -246,10 +296,28 @@ Authorization: Bearer <your_jwt_token>
 ```
 
 ### Key Endpoints
+
+#### Authentication
 - `POST /api/auth/login` - User login
 - `POST /api/auth/register` - User registration
+
+#### Case Management
 - `GET /api/cases` - Get user cases
+- `POST /api/cases` - Create new case
+- `PUT /api/cases/:id` - Update case
+
+#### Appointments
 - `POST /api/appointments` - Create appointment
+- `GET /api/appointments` - Get user appointments
+
+#### Payments (M-Pesa)
+- `POST /api/payments/stk-push` - Initiate STK Push payment
+- `GET /api/payments/:id/status` - Query payment status
+- `GET /api/payments` - Get payment history
+- `POST /api/payments/:id/refund` - Initiate refund (admin only)
+- `GET /api/payments/analytics` - Get transaction analytics (admin only)
+
+#### Dashboard
 - `GET /api/dashboard/stats` - Get dashboard statistics
 
 ## 🤝 Contributing
@@ -293,8 +361,8 @@ If you encounter any issues or have questions:
 - ✅ Appointment Scheduling
 - ✅ Client Dashboard
 - ✅ Document Management
-- 🚧 Payment Integration (In Progress)
-- 🚧 Real-time Chat (In Progress)
+- ✅ M-Pesa Payment Integration
+- ✅ Real-time Chat System
 - 📋 Email Notifications (Planned)
 - 📋 Mobile App (Planned)
 

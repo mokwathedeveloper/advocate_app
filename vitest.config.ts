@@ -1,7 +1,10 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+
 import path from 'path';
+
+
 
 export default defineConfig({
   plugins: [react()],
@@ -9,6 +12,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/tests/setup.ts'],
+
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     exclude: [
       'node_modules',
@@ -57,4 +61,23 @@ export default defineConfig({
       '@/hooks': path.resolve(__dirname, './src/hooks')
     }
   }
+
+    css: true,
+    coverage: {
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'src/tests/',
+        '**/*.d.ts',
+        '**/*.config.*',
+        '**/coverage/**',
+      ],
+    },
+  },
+  resolve: {
+    alias: {
+      '@': './src',
+    },
+  },
+
 });

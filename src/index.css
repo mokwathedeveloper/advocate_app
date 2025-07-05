@@ -2,3 +2,133 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Enhanced Toast Animations and Styles for LegalPro v1.0.1 */
+
+/* Toast Container Styles */
+.toast-container {
+  pointer-events: none;
+}
+
+.toast-container > * {
+  pointer-events: auto;
+}
+
+/* Toast Animation Classes */
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes toast-leave {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%) scale(0.8);
+  }
+}
+
+.animate-enter {
+  animation: toast-enter 0.3s ease-out forwards;
+}
+
+.animate-leave {
+  animation: toast-leave 0.2s ease-in forwards;
+}
+
+/* Toast Hover Effects */
+.toast-hover:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Progress Bar Animations */
+.toast-progress {
+  transition: width 0.1s linear;
+}
+
+/* Mobile Responsive Toast Styles */
+@media (max-width: 640px) {
+  .toast-container {
+    left: 16px !important;
+    right: 16px !important;
+    top: 16px !important;
+    transform: none !important;
+  }
+
+  .toast-mobile {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  /* Mobile swipe gesture indicator */
+  .toast-swipe-indicator {
+    position: relative;
+  }
+
+  .toast-swipe-indicator::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 1px;
+  }
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  .animate-enter,
+  .animate-leave,
+  .toast-hover:hover {
+    animation: none;
+    transform: none;
+    transition: none;
+  }
+
+  .toast-progress {
+    transition: none;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .toast-container [role="alert"] {
+    border: 2px solid currentColor;
+  }
+
+  .toast-progress {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Focus Indicators for Accessibility */
+.toast-container [role="alert"]:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.toast-container button:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .toast-container [role="alert"] {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  }
+}

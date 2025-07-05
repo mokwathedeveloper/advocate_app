@@ -26,9 +26,14 @@ import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
+
 import { caseService, CaseFilters } from '../services/caseService';
 import { Case } from '../types';
 import toast from 'react-hot-toast';
+
+import { showToast } from '../services/toastService';
+import { RotateCcw, Eye, FileText, Upload, Download } from 'lucide-react';
+
 
 interface CaseFormData {
   title: string;
@@ -190,6 +195,7 @@ const Cases: React.FC = () => {
     }
   };
 
+
   // Clear all filters
   const clearFilters = () => {
     const clearedFilters = {
@@ -204,6 +210,58 @@ const Cases: React.FC = () => {
       sortOrder: 'desc' as const
     };
     loadCases(clearedFilters);
+
+  const onSubmit = async (data: CaseFormData) => {
+    const loadingToastId = showToast.loading('Creating new case...', {
+      title: 'Creating Case',
+      progress: 0
+    });
+
+    try {
+      // Simulate progress updates
+      setTimeout(() => toastService.updateProgress(loadingToastId, 30), 500);
+      setTimeout(() => toastService.updateProgress(loadingToastId, 60), 1000);
+      setTimeout(() => toastService.updateProgress(loadingToastId, 90), 1500);
+
+      // API call to create case
+      console.log('Creating case:', data);
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      showToast.dismiss(loadingToastId);
+      showToast.success('Case created successfully! You can now add documents and track progress.', {
+        title: 'Case Created',
+        actions: [
+          {
+            label: 'View Case',
+            action: () => console.log('View case'),
+            icon: Eye
+          },
+          {
+            label: 'Add Documents',
+            action: () => console.log('Add documents'),
+            icon: Upload
+          }
+        ]
+      });
+
+      reset();
+      setShowCreateForm(false);
+    } catch (error: any) {
+      showToast.dismiss(loadingToastId);
+      showToast.error(error.message || 'Failed to create case. Please check your information and try again.', {
+        title: 'Case Creation Failed',
+        actions: [
+          {
+            label: 'Retry',
+            action: () => onSubmit(data),
+            icon: RotateCcw
+          }
+        ]
+      });
+    }
+
   };
 
   if (loading) {

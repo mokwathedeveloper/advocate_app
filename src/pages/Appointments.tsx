@@ -19,7 +19,8 @@ import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
-import toast from 'react-hot-toast';
+import { showToast } from '../services/toastService';
+import { RotateCcw, Calendar as CalendarIcon, CreditCard, Bell } from 'lucide-react';
 
 interface AppointmentFormData {
   title: string;
@@ -94,14 +95,57 @@ const Appointments: React.FC = () => {
   ];
 
   const onSubmit = async (data: AppointmentFormData) => {
+    const loadingToastId = showToast.loading('Booking your appointment...', {
+      title: 'Booking Appointment'
+    });
+
     try {
       // Here you would make an API call to book the appointment
       console.log('Booking appointment:', data);
-      toast.success('Appointment booked successfully!');
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      showToast.dismiss(loadingToastId);
+      showToast.success('Appointment booked successfully! You will receive a confirmation email shortly.', {
+        title: 'Appointment Confirmed',
+        actions: [
+          {
+            label: 'View Calendar',
+            action: () => console.log('View calendar'),
+            icon: CalendarIcon
+          },
+          {
+            label: 'Make Payment',
+            action: () => console.log('Make payment'),
+            icon: CreditCard
+          },
+          {
+            label: 'Set Reminder',
+            action: () => {
+              showToast.info('Reminder set for 1 hour before your appointment.', {
+                title: 'Reminder Set'
+              });
+            },
+            icon: Bell
+          }
+        ]
+      });
+
       reset();
       setShowBookingForm(false);
-    } catch (error) {
-      toast.error('Failed to book appointment');
+    } catch (error: any) {
+      showToast.dismiss(loadingToastId);
+      showToast.error(error.message || 'Failed to book appointment. Please try again or contact support.', {
+        title: 'Booking Failed',
+        actions: [
+          {
+            label: 'Retry',
+            action: () => onSubmit(data),
+            icon: RotateCcw
+          }
+        ]
+      });
     }
   };
 

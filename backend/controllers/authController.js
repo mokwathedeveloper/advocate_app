@@ -3,9 +3,22 @@ const crypto = require('crypto');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const { sendNotification } = require('../utils/notificationService');
+
 const { sendEmailVerification } = require('../utils/emailVerification');
 const auditLogger = require('../utils/auditLogger');
 const validator = require('validator');
+
+const {
+  createSuccessResponse,
+  createValidationErrorResponse,
+  createConflictErrorResponse,
+  createAuthErrorResponse,
+  createNotFoundErrorResponse,
+  createServerErrorResponse,
+  handleMongooseValidationError,
+  handleMongoDuplicateKeyError
+} = require('../utils/errorResponse');
+
 
 // Generate JWT
 const signToken = (id) => {
@@ -15,17 +28,23 @@ const signToken = (id) => {
 };
 
 // Create token response
-const createTokenResponse = (user, statusCode, res) => {
+const createTokenResponse = (user, statusCode, res, message = 'Success', requestId = null) => {
   const token = signToken(user._id);
 
   // Remove password from output
   user.password = undefined;
 
-  res.status(statusCode).json({
-    success: true,
-    token,
-    user
-  });
+  const response = createSuccessResponse(
+    {
+      token,
+      user
+    },
+    message,
+    statusCode,
+    requestId
+  );
+
+  res.status(statusCode).json(response);
 };
 
 // Comprehensive input validation for registration
@@ -158,8 +177,11 @@ const sendWelcomeNotification = async (user) => {
 // @route   POST /api/auth/register
 // @access  Public
 const register = async (req, res) => {
+  const requestId = req.id || require('uuid').v4();
+
   try {
     console.log('Registration request received:', {
+
       email: req.body.email,
       role: req.body.role,
       timestamp: new Date().toISOString(),
@@ -167,6 +189,13 @@ const register = async (req, res) => {
     });
 
     // Extract and validate input data
+
+      ...req.body,
+      password: '[REDACTED]'
+    });
+
+    // Extract user data from request body
+
     const {
       firstName,
       lastName,
@@ -181,6 +210,7 @@ const register = async (req, res) => {
       barAdmission,
       superKey
     } = req.body;
+
 
     // Comprehensive input validation
     const validationErrors = validateRegistrationInput({
@@ -261,20 +291,41 @@ const register = async (req, res) => {
       role: role || 'client',
       registrationDate: new Date(),
       registrationIP: req.ip || req.connection.remoteAddress
+
+    // Prepare user data for creation
+    const userData = {
+      firstName: firstName?.trim(),
+      lastName: lastName?.trim(),
+      email: email?.trim().toLowerCase(),
+      password,
+      phone: phone?.trim(),
+      role: role || 'client'
+
     };
 
     // Add advocate-specific fields with enhanced validation
     if (role === 'advocate') {
+
       userData.licenseNumber = licenseNumber.trim();
       userData.specialization = specialization.trim();
       userData.experience = experience.trim();
       userData.education = education.trim();
       userData.barAdmission = barAdmission.trim();
       userData.isVerified = true; // Auto-verify with valid super key
+
+      userData.licenseNumber = licenseNumber?.trim();
+      userData.specialization = specialization;
+      userData.experience = experience;
+      userData.education = education?.trim();
+      userData.barAdmission = barAdmission?.trim();
+      // Auto-verify advocates who register (can be changed based on business logic)
+      userData.isVerified = true;
+
       userData.isActive = true;
       userData.verificationDate = new Date();
       userData.verificationMethod = 'super_key';
     }
+
 
     console.log('Creating user account:', {
       email: userData.email,
@@ -283,7 +334,16 @@ const register = async (req, res) => {
     });
 
     // Create user account
+
+    console.log('Creating user with data:', {
+      ...userData,
+      password: '[REDACTED]'
+    });
+
+    // Create user in database
+
     const user = await User.create(userData);
+
 
     console.log('User account created successfully:', {
       userId: user._id,
@@ -340,8 +400,25 @@ const register = async (req, res) => {
         message: 'Please verify your email address to complete the registration process.'
       }
     });
+
+    // Send welcome notification asynchronously
+    sendNotification(user, 'welcome', {})
+      .then(result => console.log('Welcome notification sent:', result))
+      .catch(error => console.error('Welcome notification failed:', error));
+
+    // Return success response with token
+    createTokenResponse(
+      user,
+      201,
+      res,
+      'User registered successfully',
+      requestId
+    );
+
+
   } catch (error) {
-    console.error('Register error:', error);
+    console.error('Registration error:', error);
+
 
     // Log failed registration attempt
     await auditLogger.log({
@@ -360,28 +437,32 @@ const register = async (req, res) => {
     });
 
     // Handle validation errors
+
+    // Handle Mongoose validation errors
+
     if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({
-        success: false,
-        message: 'Validation error',
-        errors: messages
-      });
+      const errorResponse = handleMongooseValidationError(error, requestId);
+      return res.status(400).json(errorResponse);
     }
 
-    // Handle duplicate key error
+    // Handle MongoDB duplicate key errors
     if (error.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email already exists'
-      });
+      const errorResponse = handleMongoDuplicateKeyError(error, requestId);
+      return res.status(409).json(errorResponse);
     }
 
-    res.status(500).json({
-      success: false,
-      message: 'Server error during registration',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    // Handle other errors
+    const errorResponse = createServerErrorResponse(
+      'Server error during registration',
+      'REGISTRATION_SERVER_ERROR',
+      process.env.NODE_ENV === 'development' ? {
+        message: error.message,
+        stack: error.stack
+      } : {},
+      requestId
+    );
+
+    res.status(500).json(errorResponse);
   }
 };
 
@@ -389,64 +470,88 @@ const register = async (req, res) => {
 // @route   POST /api/auth/login
 // @access  Public
 const login = async (req, res) => {
+  const requestId = req.id || require('uuid').v4();
+
   try {
     const { email, password } = req.body;
 
-    // Validate email & password
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide an email and password'
-      });
-    }
+    console.log('Login attempt for email:', email);
 
-    // Check for user
-    const user = await User.findOne({ email }).select('+password');
+    // Find user and include password for verification
+    const user = await User.findOne({
+      email: email?.trim().toLowerCase()
+    }).select('+password');
 
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
+      const errorResponse = createAuthErrorResponse(
+        'Invalid email or password',
+        'INVALID_CREDENTIALS',
+        requestId
+      );
+      return res.status(401).json(errorResponse);
     }
 
     // Check if password matches
     const isMatch = await user.matchPassword(password);
 
     if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
+      const errorResponse = createAuthErrorResponse(
+        'Invalid email or password',
+        'INVALID_CREDENTIALS',
+        requestId
+      );
+      return res.status(401).json(errorResponse);
     }
 
-    // Check if user is active
+    // Check if user account is active
     if (!user.isActive) {
-      return res.status(401).json({
-        success: false,
-        message: 'Account is deactivated. Please contact administrator.'
-      });
+      const errorResponse = createAuthErrorResponse(
+        'Account is deactivated. Please contact administrator.',
+        'ACCOUNT_DEACTIVATED',
+        requestId
+      );
+      return res.status(401).json(errorResponse);
     }
 
-    // Check if advocate is verified
+    // Check if advocate account is verified
     if (user.role === 'advocate' && !user.isVerified) {
-      return res.status(401).json({
-        success: false,
-        message: 'Account is pending verification. Please contact administrator.'
-      });
+      const errorResponse = createAuthErrorResponse(
+        'Account is pending verification. Please contact administrator.',
+        'ACCOUNT_PENDING_VERIFICATION',
+        requestId
+      );
+      return res.status(401).json(errorResponse);
     }
 
-    // Update last login
+    // Update last login timestamp
     user.lastLogin = new Date();
     await user.save();
 
-    createTokenResponse(user, 200, res);
+    console.log('Login successful for user:', user._id);
+
+    // Return success response with token
+    createTokenResponse(
+      user,
+      200,
+      res,
+      'Login successful',
+      requestId
+    );
+
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during login'
-    });
+
+    const errorResponse = createServerErrorResponse(
+      'Server error during login',
+      'LOGIN_SERVER_ERROR',
+      process.env.NODE_ENV === 'development' ? {
+        message: error.message,
+        stack: error.stack
+      } : {},
+      requestId
+    );
+
+    res.status(500).json(errorResponse);
   }
 };
 

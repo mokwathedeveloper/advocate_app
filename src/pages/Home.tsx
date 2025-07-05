@@ -79,9 +79,9 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-navy-900 via-navy-800 to-navy-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 text-white overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-900/20 to-transparent"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -90,9 +90,9 @@ const Home: React.FC = () => {
             >
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
                 Expert Legal Solutions for Your{' '}
-                <span className="text-gold-400">Peace of Mind</span>
+                <span className="text-secondary-400 bg-gradient-to-r from-secondary-400 to-secondary-300 bg-clip-text text-transparent">Peace of Mind</span>
               </h1>
-              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+              <p className="text-xl text-primary-100 mb-8 leading-relaxed">
                 Professional legal services with a personal touch. We're here to protect your rights and guide you through every legal challenge.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">

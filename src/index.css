@@ -1,8 +1,145 @@
-/* Global styles for LegalPro v1.0.1 */
+/* Global styles for LegalPro v1.0.1 - Professional Color System */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+
+/* CSS Custom Properties for Theme Support */
+@layer base {
+  :root {
+    /* Primary Brand Colors */
+    --color-primary-50: 239 248 255;
+    --color-primary-100: 219 234 254;
+    --color-primary-200: 191 219 254;
+    --color-primary-300: 147 197 253;
+    --color-primary-400: 96 165 250;
+    --color-primary-500: 59 130 246;
+    --color-primary-600: 37 99 235;
+    --color-primary-700: 29 78 216;
+    --color-primary-800: 30 64 175;
+    --color-primary-900: 30 58 138;
+
+    /* Secondary Brand Colors */
+    --color-secondary-50: 255 251 235;
+    --color-secondary-100: 254 243 199;
+    --color-secondary-200: 253 230 138;
+    --color-secondary-300: 252 211 77;
+    --color-secondary-400: 251 191 36;
+    --color-secondary-500: 245 158 11;
+    --color-secondary-600: 217 119 6;
+    --color-secondary-700: 180 83 9;
+    --color-secondary-800: 146 64 14;
+    --color-secondary-900: 120 53 15;
+
+    /* Semantic Colors */
+    --color-success-50: 240 253 244;
+    --color-success-100: 220 252 231;
+    --color-success-200: 187 247 208;
+    --color-success-300: 134 239 172;
+    --color-success-400: 74 222 128;
+    --color-success-500: 34 197 94;
+    --color-success-600: 22 163 74;
+    --color-success-700: 21 128 61;
+    --color-success-800: 22 101 52;
+    --color-success-900: 20 83 45;
+
+    --color-error-50: 254 242 242;
+    --color-error-100: 254 226 226;
+    --color-error-200: 254 202 202;
+    --color-error-300: 252 165 165;
+    --color-error-400: 248 113 113;
+    --color-error-500: 239 68 68;
+    --color-error-600: 220 38 38;
+    --color-error-700: 185 28 28;
+    --color-error-800: 153 27 27;
+    --color-error-900: 127 29 29;
+
+    --color-warning-50: 255 251 235;
+    --color-warning-100: 254 243 199;
+    --color-warning-200: 253 230 138;
+    --color-warning-300: 252 211 77;
+    --color-warning-400: 251 191 36;
+    --color-warning-500: 245 158 11;
+    --color-warning-600: 217 119 6;
+    --color-warning-700: 180 83 9;
+    --color-warning-800: 146 64 14;
+    --color-warning-900: 120 53 15;
+
+    /* Neutral Colors */
+    --color-neutral-50: 249 250 251;
+    --color-neutral-100: 243 244 246;
+    --color-neutral-200: 229 231 235;
+    --color-neutral-300: 209 213 219;
+    --color-neutral-400: 156 163 175;
+    --color-neutral-500: 107 114 128;
+    --color-neutral-600: 75 85 99;
+    --color-neutral-700: 55 65 81;
+    --color-neutral-800: 31 41 55;
+    --color-neutral-900: 17 24 39;
+
+    /* Surface Colors */
+    --color-surface-primary: 255 255 255;
+    --color-surface-secondary: 249 250 251;
+    --color-surface-tertiary: 243 244 246;
+    --color-surface-elevated: 255 255 255;
+
+    /* Border Colors */
+    --color-border-light: 243 244 246;
+    --color-border-default: 229 231 235;
+    --color-border-medium: 209 213 219;
+    --color-border-strong: 156 163 175;
+    --color-border-focus: 59 130 246;
+  }
+
+  /* Dark Theme Support */
+  .dark {
+    --color-surface-primary: 31 41 55;
+    --color-surface-secondary: 17 24 39;
+    --color-surface-tertiary: 15 23 42;
+    --color-surface-elevated: 31 41 55;
+
+    --color-neutral-50: 17 24 39;
+    --color-neutral-100: 31 41 55;
+    --color-neutral-200: 55 65 81;
+    --color-neutral-300: 75 85 99;
+    --color-neutral-400: 107 114 128;
+    --color-neutral-500: 156 163 175;
+    --color-neutral-600: 209 213 219;
+    --color-neutral-700: 229 231 235;
+    --color-neutral-800: 243 244 246;
+    --color-neutral-900: 249 250 251;
+
+    --color-border-light: 55 65 81;
+    --color-border-default: 75 85 99;
+    --color-border-medium: 107 114 128;
+    --color-border-strong: 156 163 175;
+  }
+}
+
+/* Enhanced Focus Styles for Accessibility */
+@layer base {
+  *:focus {
+    outline: 2px solid rgb(var(--color-primary-500));
+    outline-offset: 2px;
+  }
+
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  *:focus-visible {
+    outline: 2px solid rgb(var(--color-primary-500));
+    outline-offset: 2px;
+  }
+}
+
+/* Smooth Theme Transitions */
+@layer base {
+  * {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+=======
 /* Enhanced Toast Animations and Styles for LegalPro v1.0.1 */
 
 /* Toast Container Styles */
@@ -130,5 +267,6 @@
 @media (prefers-color-scheme: dark) {
   .toast-container [role="alert"] {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+
   }
 }

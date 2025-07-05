@@ -100,7 +100,11 @@ const Navbar: React.FC = () => {
   };
 
   return (
+
+    <nav className="bg-white shadow-lg relative z-50" role="navigation" aria-label="Main navigation">
+
     <nav className="bg-white dark:bg-neutral-800 shadow-lg border-b border-neutral-200 dark:border-neutral-700 relative z-50">
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo */}
@@ -119,13 +123,18 @@ const Navbar: React.FC = () => {
               <Link
                 key={item.path}
                 to={item.path}
+
+                className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
+
                 className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+
                   isActive(item.path)
                     ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 shadow-sm'
                     : 'text-neutral-700 dark:text-neutral-300 hover:text-primary-700 dark:hover:text-primary-400 hover:bg-neutral-100 dark:hover:bg-neutral-700'
                 }`}
+                aria-current={isActive(item.path) ? 'page' : undefined}
               >
-                {item.icon && <item.icon className="h-4 w-4" />}
+                {item.icon && <item.icon className="h-4 w-4" aria-hidden="true" />}
                 <span>{item.label}</span>
               </Link>
             ))}
@@ -225,12 +234,19 @@ const Navbar: React.FC = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+
+              className="text-neutral-700 hover:text-primary-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 p-2 rounded-md"
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
+              aria-label={isMenuOpen ? 'Close main menu' : 'Open main menu'}
+
               className="text-neutral-700 dark:text-neutral-300 hover:text-primary-700 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-800 p-2 rounded-lg transition-colors"
+
             >
               {isMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-6 w-6" aria-hidden="true" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-6 w-6" aria-hidden="true" />
               )}
             </button>
           </div>
@@ -244,7 +260,14 @@ const Navbar: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
+
+            className="md:hidden bg-white border-t"
+            id="mobile-menu"
+            role="menu"
+            aria-label="Mobile navigation menu"
+
             className="md:hidden bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700"
+
           >
             <div className="px-4 pt-4 pb-3 space-y-2">
               {navItems.map((item) => (

@@ -35,56 +35,67 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" role="main">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="max-w-md w-full"
       >
-        <Card className="p-8">
+        <Card className="p-8" role="form" aria-labelledby="login-heading">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-navy-800 mb-2">Welcome to LegalPro</h2>
+            <h1 id="login-heading" className="text-3xl font-bold text-navy-800 mb-2">Welcome to LegalPro</h1>
             <p className="text-gray-600">Advocate • Admin • Client Login</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <Input
-              label="Email Address"
-              type="email"
-              icon={<Mail className="w-5 h-5 text-gray-400" />}
-              error={errors.email?.message}
-              {...register('email', {
-                required: 'Email is required',
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Invalid email address'
-                }
-              })}
-            />
-
-            <div className="relative">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+            <fieldset className="space-y-6">
+              <legend className="sr-only">Login credentials</legend>
               <Input
-                label="Password"
-                type={showPassword ? 'text' : 'password'}
-                icon={<Lock className="w-5 h-5 text-gray-400" />}
-                error={errors.password?.message}
-                {...register('password', {
-                  required: 'Password is required',
-                  minLength: {
-                    value: 6,
-                    message: 'Password must be at least 6 characters'
+                label="Email Address"
+                type="email"
+                icon={<Mail className="w-5 h-5 text-gray-400" />}
+                error={errors.email?.message}
+                required
+                showRequiredIndicator
+                autoComplete="email"
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: 'Invalid email address'
                   }
                 })}
               />
-              <button
-                type="button"
-                className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
-            </div>
+
+              <div className="relative">
+                <Input
+                  label="Password"
+                  type={showPassword ? 'text' : 'password'}
+                  icon={<Lock className="w-5 h-5 text-gray-400" />}
+                  error={errors.password?.message}
+                  required
+                  showRequiredIndicator
+                  autoComplete="current-password"
+                  {...register('password', {
+                    required: 'Password is required',
+                    minLength: {
+                      value: 6,
+                      message: 'Password must be at least 6 characters'
+                    }
+                  })}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-8 text-gray-400 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded p-1"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
+                </button>
+              </div>
+            </fieldset>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -137,7 +148,7 @@ const Login: React.FC = () => {
           </div>
         </Card>
       </motion.div>
-    </div>
+    </main>
   );
 };
 

@@ -21,10 +21,13 @@ const dashboardRoutes = require('./routes/dashboard');
 const paymentRoutes = require('./routes/payments');
 const notificationRoutes = require('./routes/notifications');
 const whatsappRoutes = require('./routes/whatsapp');
+const emailVerificationRoutes = require('./routes/emailVerification');
+const securityRoutes = require('./routes/security');
 
 // Import middleware
 const { notFound } = require('./middleware/notFound');
 const { errorHandler } = require('./middleware/errorHandler');
+const { handleJSONError } = require('./middleware/validation');
 
 // Import chat socket server
 const ChatSocketServer = require('./socket/socketServer');
@@ -79,9 +82,10 @@ app.options('*', (req, res) => {
   res.sendStatus(200);
 });
 
-// Body parsing middleware
+// Body parsing middleware with JSON error handling
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(handleJSONError);
 
 // Data sanitization
 app.use(mongoSanitize());
@@ -146,6 +150,8 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/user-management', require('./routes/userManagement'));
+app.use('/api/email-verification', emailVerificationRoutes);
+app.use('/api/security', securityRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

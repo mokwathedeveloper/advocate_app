@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import AdvocateRegister from './pages/auth/AdvocateRegister';
+import EmailVerification from './pages/auth/EmailVerification';
 import AdminManagement from './pages/AdminManagement';
 import PracticeAreas from './pages/PracticeAreas';
 import Contact from './pages/Contact';
@@ -19,7 +20,7 @@ import Resources from './pages/Resources';
 import Locations from './pages/Locations';
 import NotFound from './pages/NotFound';
 import Cases from './pages/Cases';
-import Appointments from './pages/Appointments';
+import AppointmentDashboard from './pages/appointments/AppointmentDashboard';
 import Messages from './pages/Messages';
 import WhatsAppWidget from './components/whatsapp/WhatsAppWidget';
 
@@ -99,6 +100,14 @@ function App() {
                 </PublicRoute>
               }
             />
+            <Route
+              path="verify-email"
+              element={
+                <PublicRoute>
+                  <EmailVerification />
+                </PublicRoute>
+              }
+            />
 
             {/* Protected routes */}
             <Route
@@ -132,7 +141,7 @@ function App() {
               path="appointments"
               element={
                 <ProtectedRoute>
-                  <Appointments />
+                  <AppointmentDashboard />
                 </ProtectedRoute>
               }
             />

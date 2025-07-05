@@ -1,5 +1,9 @@
+
 // Jest Configuration - LegalPro v1.0.1
 // Test configuration for comprehensive case management testing
+
+
+// Jest configuration for LegalPro backend tests
 
 module.exports = {
   // Test environment
@@ -14,6 +18,7 @@ module.exports = {
   // Coverage configuration
   collectCoverage: true,
   coverageDirectory: 'coverage',
+
   coverageReporters: [
     'text',
     'lcov',
@@ -27,6 +32,14 @@ module.exports = {
     'services/**/*.js',
     'models/**/*.js',
     'middleware/**/*.js',
+
+  coverageReporters: ['text', 'lcov', 'html'],
+  collectCoverageFrom: [
+    'controllers/**/*.js',
+    'middleware/**/*.js',
+    'models/**/*.js',
+    'routes/**/*.js',
+
     'utils/**/*.js',
     '!**/node_modules/**',
     '!**/tests/**',
@@ -36,10 +49,17 @@ module.exports = {
   // Coverage thresholds
   coverageThreshold: {
     global: {
+
       branches: 70,
       functions: 70,
       lines: 70,
       statements: 70
+
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80
+
     }
   },
 
@@ -59,6 +79,7 @@ module.exports = {
   forceExit: true,
 
   // Detect open handles
+
   detectOpenHandles: true,
 
   // Transform configuration
@@ -109,4 +130,7 @@ module.exports = {
     'jest-watch-typeahead/filename',
     'jest-watch-typeahead/testname'
   ]
+
+  detectOpenHandles: true
+
 };

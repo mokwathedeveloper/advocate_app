@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Update - LegalPro</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            color: #1e3a8a;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .update-title {
+            color: #1e3a8a;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .case-details {
+            background-color: #f0f9ff;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 4px solid #1e3a8a;
+            margin: 20px 0;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-active { background-color: #dbeafe; color: #1e40af; }
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-completed { background-color: #d1fae5; color: #065f46; }
+        .status-closed { background-color: #fee2e2; color: #991b1b; }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #374151;
+        }
+        .detail-value {
+            color: #1e3a8a;
+            font-weight: 500;
+        }
+        .update-content {
+            background-color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #1e3a8a;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">LegalPro</div>
+            <div style="color: #6b7280;">Expert Legal Solutions</div>
+        </div>
+
+        <h1 class="update-title">📋 Case Update</h1>
+
+        <p>Dear {{clientName}},</p>
+
+        <p>We have an important update regarding your case. Please review the details below:</p>
+
+        <div class="case-details">
+            <h3 style="margin-top: 0; color: #1e3a8a;">Case Information</h3>
+            
+            <div class="detail-row">
+                <span class="detail-label">📁 Case Title:</span>
+                <span class="detail-value">{{caseTitle}}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">🆔 Case ID:</span>
+                <span class="detail-value">{{caseId}}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">👨‍💼 Advocate:</span>
+                <span class="detail-value">{{advocateName}}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">📅 Last Updated:</span>
+                <span class="detail-value">{{updateDate}}</span>
+            </div>
+            
+            <div class="detail-row">
+                <span class="detail-label">🏷️ Status:</span>
+                <span class="detail-value">
+                    <span class="status-badge status-{{statusClass}}">{{status}}</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="update-content">
+            <h4 style="margin-top: 0; color: #1e3a8a;">📝 Update Details:</h4>
+            <p>{{updateMessage}}</p>
+            
+            {{#if notes}}
+            <h4 style="color: #1e3a8a;">Additional Notes:</h4>
+            <p>{{notes}}</p>
+            {{/if}}
+            
+            {{#if nextSteps}}
+            <h4 style="color: #1e3a8a;">🎯 Next Steps:</h4>
+            <p>{{nextSteps}}</p>
+            {{/if}}
+        </div>
+
+        {{#if documentsRequired}}
+        <div style="background-color: #fef3c7; padding: 15px; border-radius: 5px; border-left: 4px solid #f59e0b; margin: 20px 0;">
+            <h4 style="margin-top: 0; color: #92400e;">📄 Documents Required:</h4>
+            <p>{{documentsRequired}}</p>
+        </div>
+        {{/if}}
+
+        {{#if nextHearing}}
+        <div style="background-color: #dbeafe; padding: 15px; border-radius: 5px; border-left: 4px solid #1e3a8a; margin: 20px 0;">
+            <h4 style="margin-top: 0; color: #1e3a8a;">⚖️ Next Hearing:</h4>
+            <p><strong>Date:</strong> {{nextHearing.date}}</p>
+            <p><strong>Time:</strong> {{nextHearing.time}}</p>
+            <p><strong>Location:</strong> {{nextHearing.location}}</p>
+        </div>
+        {{/if}}
+
+        <div style="text-align: center;">
+            <a href="{{caseUrl}}" class="cta-button">View Case Details</a>
+        </div>
+
+        <div style="margin-top: 30px; padding: 15px; background-color: #f9fafb; border-radius: 5px;">
+            <h4 style="margin-top: 0; color: #1e3a8a;">Questions or Concerns?</h4>
+            <p>If you have any questions about this update, please don't hesitate to contact us:</p>
+            <ul style="list-style: none; padding: 0; margin-bottom: 0;">
+                <li>📧 Email: cases@legalpro.co.ke</li>
+                <li>📞 Phone: +254 726 745 739</li>
+                <li>💬 WhatsApp: +254 726 745 739</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>Thank you for trusting LegalPro with your legal matters.</p>
+            <p><strong>The LegalPro Team</strong></p>
+        </div>
+    </div>
+</body>
+</html>

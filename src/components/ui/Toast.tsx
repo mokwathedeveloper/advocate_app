@@ -8,6 +8,12 @@ import {
   Info, 
   Loader2, 
   X,
+
+
+  RotateCcw,
+  Eye,
+  ExternalLink,
+
   Clock
 } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -81,7 +87,11 @@ const TOAST_STYLES = {
     progressBar: 'bg-white'
   },
   loading: {
+
     container: 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-lg shadow-indigo-600/30',
+
+    container: 'bg-gradient-to-r from-navy-800 to-navy-900 text-white shadow-lg shadow-navy-800/30',
+
     icon: 'text-white animate-spin',
     progress: 'bg-white bg-opacity-30',
     progressBar: 'bg-white'

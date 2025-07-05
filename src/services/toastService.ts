@@ -276,6 +276,18 @@ class ToastService {
   }
 
   /**
+
+
+   * Update loading toast progress
+   */
+  updateProgress(toastId: string, progress: number): void {
+    // This would require custom implementation with react-hot-toast
+    // For now, we'll dismiss and recreate with new progress
+    toast.dismiss(toastId);
+  }
+
+  /**
+
    * Dismiss specific toast
    */
   dismiss(toastId: string): void {
@@ -354,7 +366,11 @@ export const showToast = {
   warning: (message: string, options?: EnhancedToastOptions) => toastService.warning(message, options),
   info: (message: string, options?: EnhancedToastOptions) => toastService.info(message, options),
   loading: (message: string, options?: EnhancedToastOptions) => toastService.loading(message, options),
+
   promise: <T>(promise: Promise<T>, messages: any, options?: EnhancedToastOptions) => 
+
+  promise: <T>(promise: Promise<T>, messages: any, options?: EnhancedToastOptions) =>
+
     toastService.promise(promise, messages, options),
   dismiss: (toastId: string) => toastService.dismiss(toastId),
   dismissAll: () => toastService.dismissAll()

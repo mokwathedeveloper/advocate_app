@@ -211,6 +211,7 @@ const authorizeRoles = (...roles) => {
   };
 };
 
+
 /**
  * Check if user has specific role(s)
  * @param {String|Array} requiredRoles - Required role(s)
@@ -351,3 +352,17 @@ module.exports = {
   requireMinimumRole,
   requireOwnershipOrAdmin
 };
+
+// Admin only access
+const adminOnly = (req, res, next) => {
+  if (req.user.rol 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'Access denied. Administrator privileges required.'
+    });
+  }
+  next();
+};
+
+module.exports = { protect, authorize, adminOnly };
+

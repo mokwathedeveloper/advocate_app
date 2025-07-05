@@ -1,6 +1,8 @@
 // Main App component for LegalPro v1.0.1
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
 import Home from './pages/Home';
@@ -178,6 +180,20 @@ function App() {
           phoneNumber="254726745739"
           message="Hello! I need legal assistance from LegalPro."
           position="bottom-right"
+        />
+
+        {/* Toast notifications for chat system */}
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
         />
       </Router>
     </AuthProvider>

@@ -29,8 +29,8 @@ const { notFound } = require('./middleware/notFound');
 const { errorHandler } = require('./middleware/errorHandler');
 const { handleJSONError } = require('./middleware/validation');
 
-// Import socket handler
-const socketHandler = require('./socket/socketHandler');
+// Import chat socket server
+const ChatSocketServer = require('./socket/socketServer');
 
 const app = express();
 const server = http.createServer(app);
@@ -166,16 +166,8 @@ app.get('/api/health', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
-// Socket.IO setup
-const io = require('socket.io')(server, {
-  cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST'],
-    credentials: true
-  }
-});
-
-socketHandler(io);
+// Initialize Chat Socket Server
+const chatSocketServer = new ChatSocketServer(server);
 
 const PORT = process.env.PORT || 5000;
 

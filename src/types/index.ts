@@ -33,38 +33,65 @@ export interface User {
 }
 
 export interface Case {
+  _id: string;
   id: string;
-  clientId: string;
+  caseNumber: string;
+  clientId: string | User;
   title: string;
   description: string;
   category: string;
   status: 'pending' | 'in_progress' | 'completed' | 'closed';
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  assignedTo?: string;
+  assignedTo?: string | User;
   courtDate?: string;
-  documents: Document[];
+  documents: CaseDocument[];
   notes: CaseNote[];
+  timeline: TimelineEvent[];
+  clientName?: string;
+  isArchived?: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Document {
+export interface CaseDocument {
+  _id: string;
   id: string;
   caseId: string;
   name: string;
+  originalName: string;
   type: string;
   size: number;
   url: string;
-  uploadedBy: string;
+  publicId: string;
+  uploadedBy: string | User;
+  description?: string;
+  tags?: string[];
+  downloadCount?: number;
+  lastAccessed?: string;
+  metadata?: any;
   uploadedAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
+export interface Document extends CaseDocument {}
+
 export interface CaseNote {
+  _id: string;
   id: string;
   caseId: string;
   content: string;
-  author: string;
+  author: string | User;
   isPrivate: boolean;
+  createdAt: string;
+}
+
+export interface TimelineEvent {
+  _id: string;
+  event: string;
+  description: string;
+  user: string | User;
+  metadata?: any;
   createdAt: string;
 }
 

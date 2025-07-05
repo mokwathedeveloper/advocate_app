@@ -1,59 +1,138 @@
-// Dashboard page component for LegalPro v1.0.1
-import React from 'react';
+// Enhanced Dashboard page component for LegalPro v1.0.1 - With Loading & Error Handling
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  FileText, 
-  Calendar, 
-  Clock, 
+import {
+  FileText,
+  Calendar,
+  Clock,
   DollarSign,
   MessageSquare,
   AlertCircle,
   CheckCircle,
   User,
   TrendingUp,
-  Bell
+  Bell,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useApi } from '../hooks/useApi';
+import { apiService } from '../services/apiService';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import { LoadingOverlay, SkeletonCard, SkeletonText } from '../components/ui/LoadingStates';
+import { ErrorBoundary, RetryComponent } from '../components/ui/ErrorHandling';
+import toast from 'react-hot-toast';
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Mock data - replace with actual API calls
-  const stats = [
-    { icon: FileText, label: 'Active Cases', value: '3', color: 'text-blue-600' },
-    { icon: Calendar, label: 'Upcoming Appointments', value: '2', color: 'text-green-600' },
-    { icon: Clock, label: 'Pending Actions', value: '5', color: 'text-yellow-600' },
-    { icon: DollarSign, label: 'Outstanding Fees', value: '$2,500', color: 'text-red-600' }
-  ];
+  // API calls with loading and error handling
+  const {
+    data: dashboardData,
+    loading: dashboardLoading,
+    error: dashboardError,
+    retry: retryDashboard
+  } = useApi(
+    () => apiService.getDashboardData?.() || Promise.resolve(getMockDashboardData()),
+    []
+  );
 
-  const recentCases = [
-    {
-      id: '1',
-      title: 'Property Dispute Resolution',
-      status: 'in_progress',
-      lastUpdate: '2 days ago',
-      nextAction: 'Document review scheduled',
-      priority: 'high'
-    },
-    {
-      id: '2',
-      title: 'Contract Negotiation',
-      status: 'pending',
-      lastUpdate: '1 week ago',
-      nextAction: 'Awaiting client response',
-      priority: 'medium'
-    },
-    {
-      id: '3',
-      title: 'Employment Law Consultation',
-      status: 'completed',
-      lastUpdate: '2 weeks ago',
-      nextAction: 'Case closed',
-      priority: 'low'
+  const {
+    data: recentActivity,
+    loading: activityLoading,
+    error: activityError,
+    retry: retryActivity
+  } = useApi(
+    () => apiService.getRecentActivity?.() || Promise.resolve(getMockRecentActivity()),
+    []
+  );
+
+  // Mock data fallback
+  const getMockDashboardData = () => ({
+    stats: [
+      { icon: FileText, label: 'Active Cases', value: '3', color: 'text-blue-600' },
+      { icon: Calendar, label: 'Upcoming Appointments', value: '2', color: 'text-green-600' },
+      { icon: Clock, label: 'Pending Actions', value: '5', color: 'text-yellow-600' },
+      { icon: DollarSign, label: 'Outstanding Fees', value: '$2,500', color: 'text-red-600' }
+    ]
+  });
+
+  const getMockRecentActivity = () => ({
+    cases: [
+      {
+        id: '1',
+        title: 'Property Dispute Resolution',
+        status: 'in_progress',
+        lastUpdate: '2 days ago',
+        nextAction: 'Document review scheduled',
+        priority: 'high'
+      },
+      {
+        id: '2',
+        title: 'Contract Negotiation',
+        status: 'pending',
+        lastUpdate: '1 week ago',
+        nextAction: 'Awaiting client response',
+        priority: 'medium'
+      }
+    ]
+  });
+
+  // Refresh all dashboard data
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([retryDashboard(), retryActivity()]);
+      toast.success('Dashboard refreshed successfully');
+    } catch (error) {
+      toast.error('Failed to refresh dashboard');
+    } finally {
+      setRefreshing(false);
     }
-  ];
+  };
+
+  // Show loading state for initial load
+  if (dashboardLoading && !dashboardData) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <SkeletonText lines={2} className="max-w-md" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <SkeletonCard key={index} className="h-32" />
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <SkeletonCard className="h-96" />
+            <SkeletonCard className="h-96" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (dashboardError && !dashboardData) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <RetryComponent
+            onRetry={retryDashboard}
+            error={dashboardError}
+            className="py-16"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  const stats = dashboardData?.stats || [];
+  const recentCases = recentActivity?.cases || [];
 
   const upcomingAppointments = [
     {

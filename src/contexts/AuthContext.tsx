@@ -1,8 +1,9 @@
-// Authentication context for LegalPro v1.0.1
+// Enhanced Authentication context for LegalPro v1.0.1 - With Enhanced Toast Integration
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, AuthContextType, RegisterData } from '../types';
 import { authService } from '../services/authService';
-import toast from 'react-hot-toast';
+import { showToast } from '../services/toastService';
+import { RotateCcw, LogIn, UserPlus, LogOut } from 'lucide-react';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -46,9 +47,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.login(email, password);
       localStorage.setItem('token', response.token);
       setUser(response.user);
-      toast.success('Login successful!');
+
+      showToast.success('Welcome back! Login successful.', {
+        title: 'Login Successful',
+        actions: [
+          {
+            label: 'Go to Dashboard',
+            action: () => window.location.href = '/dashboard',
+            icon: LogIn
+          }
+        ]
+      });
     } catch (error: any) {
-      toast.error(error.message || 'Login failed');
+      showToast.error(error.message || 'Login failed. Please check your credentials and try again.', {
+        title: 'Login Failed',
+        actions: [
+          {
+            label: 'Retry',
+            action: () => login(email, password),
+            icon: RotateCcw
+          }
+        ]
+      });
       throw error;
     } finally {
       setLoading(false);
@@ -61,9 +81,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.register(userData);
       localStorage.setItem('token', response.token);
       setUser(response.user);
-      toast.success('Registration successful!');
+
+      showToast.success('Account created successfully! Welcome to LegalPro.', {
+        title: 'Registration Successful',
+        actions: [
+          {
+            label: 'Complete Profile',
+            action: () => window.location.href = '/profile',
+            icon: UserPlus
+          }
+        ]
+      });
     } catch (error: any) {
-      toast.error(error.message || 'Registration failed');
+      showToast.error(error.message || 'Registration failed. Please check your information and try again.', {
+        title: 'Registration Failed',
+        actions: [
+          {
+            label: 'Retry',
+            action: () => register(userData),
+            icon: RotateCcw
+          }
+        ]
+      });
       throw error;
     } finally {
       setLoading(false);
@@ -73,7 +112,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
-    toast.success('Logged out successfully');
+
+    showToast.info('You have been logged out successfully. Thank you for using LegalPro.', {
+      title: 'Logged Out',
+      actions: [
+        {
+          label: 'Login Again',
+          action: () => window.location.href = '/login',
+          icon: LogIn
+        }
+      ]
+    });
   };
 
   const value: AuthContextType = {

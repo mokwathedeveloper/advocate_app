@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import AdvocateRegister from './pages/auth/AdvocateRegister';
+import EmailVerification from './pages/auth/EmailVerification';
 import AdminManagement from './pages/AdminManagement';
 import PracticeAreas from './pages/PracticeAreas';
 import Contact from './pages/Contact';
@@ -94,6 +95,14 @@ function App() {
               element={
                 <PublicRoute>
                   <AdvocateRegister />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="verify-email"
+              element={
+                <PublicRoute>
+                  <EmailVerification />
                 </PublicRoute>
               }
             />

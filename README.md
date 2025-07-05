@@ -368,4 +368,4 @@ If you encounter any issues or have questions:
 
 ---
 
-**Made with ❤️ by the LegalPro Team**
+**Made with  by the LegalPro Team**

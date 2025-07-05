@@ -113,6 +113,28 @@ const userSchema = new mongoose.Schema({
   lastLogin: {
     type: Date
   },
+  // Email verification fields
+  isEmailVerified: {
+    type: Boolean,
+    default: false
+  },
+  emailVerificationToken: String,
+  emailVerificationCode: String,
+  emailVerificationExpires: Date,
+  emailVerificationSentAt: Date,
+  emailVerifiedAt: Date,
+  // Registration tracking
+  registrationDate: {
+    type: Date,
+    default: Date.now
+  },
+  registrationIP: String,
+  verificationDate: Date,
+  verificationMethod: {
+    type: String,
+    enum: ['super_key', 'admin_approval', 'email_verification']
+  },
+  // Password reset fields
   resetPasswordToken: String,
   resetPasswordExpire: Date
 }, {

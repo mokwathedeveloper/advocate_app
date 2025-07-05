@@ -21,8 +21,12 @@ const dashboardRoutes = require('./routes/dashboard');
 const paymentRoutes = require('./routes/payments');
 const notificationRoutes = require('./routes/notifications');
 const whatsappRoutes = require('./routes/whatsapp');
+
+const fileRoutes = require('./routes/files');
+
 const emailVerificationRoutes = require('./routes/emailVerification');
 const securityRoutes = require('./routes/security');
+
 
 // Import middleware
 const { notFound } = require('./middleware/notFound');
@@ -149,6 +153,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
+app.use('/api/files', fileRoutes);
 app.use('/api/user-management', require('./routes/userManagement'));
 app.use('/api/email-verification', emailVerificationRoutes);
 app.use('/api/security', securityRoutes);

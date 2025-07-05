@@ -4,6 +4,9 @@ const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
 const { validateCase, validateCaseUpdate } = require('../middleware/validation');
 const caseController = require('../controllers/caseController');
+
+const { uploadSingle } = require('../middleware/upload');
+
 const { upload, validateFileSize, handleUploadError } = require('../middleware/upload');
 
 // @route   GET /api/cases/stats
@@ -15,6 +18,7 @@ router.get('/stats', protect, caseController.getCaseStats);
 // @desc    Advanced case search
 // @access  Private
 router.get('/search', protect, caseController.searchCases);
+
 
 // @route   GET /api/cases
 // @desc    Get all cases (filtered by user role)
@@ -59,6 +63,9 @@ router.get('/:id/documents', protect, caseController.getCaseDocuments);
 // @route   POST /api/cases/:id/documents
 // @desc    Upload case document
 // @access  Private
+
+router.post('/:id/documents', protect, uploadSingle('document'), caseController.uploadDocument);
+
 router.post('/:id/documents', protect, upload.single('document'), validateFileSize, handleUploadError, caseController.uploadDocument);
 
 // @route   GET /api/cases/:id/documents/:docId/download
@@ -70,6 +77,7 @@ router.get('/:id/documents/:docId/download', protect, caseController.downloadDoc
 // @desc    Delete case document
 // @access  Private
 router.delete('/:id/documents/:docId', protect, caseController.deleteDocument);
+
 
 // @route   POST /api/cases/:id/notes
 // @desc    Add case note

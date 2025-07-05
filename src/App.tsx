@@ -1,6 +1,8 @@
 // Main App component for LegalPro v1.0.1
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout/Layout';
 import Home from './pages/Home';
@@ -9,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import AdvocateRegister from './pages/auth/AdvocateRegister';
+import EmailVerification from './pages/auth/EmailVerification';
 import AdminManagement from './pages/AdminManagement';
 import PracticeAreas from './pages/PracticeAreas';
 import Contact from './pages/Contact';
@@ -17,7 +20,7 @@ import Resources from './pages/Resources';
 import Locations from './pages/Locations';
 import NotFound from './pages/NotFound';
 import Cases from './pages/Cases';
-import Appointments from './pages/Appointments';
+import AppointmentDashboard from './pages/appointments/AppointmentDashboard';
 import Messages from './pages/Messages';
 import WhatsAppWidget from './components/whatsapp/WhatsAppWidget';
 
@@ -97,6 +100,14 @@ function App() {
                 </PublicRoute>
               }
             />
+            <Route
+              path="verify-email"
+              element={
+                <PublicRoute>
+                  <EmailVerification />
+                </PublicRoute>
+              }
+            />
 
             {/* Protected routes */}
             <Route
@@ -130,7 +141,7 @@ function App() {
               path="appointments"
               element={
                 <ProtectedRoute>
-                  <Appointments />
+                  <AppointmentDashboard />
                 </ProtectedRoute>
               }
             />
@@ -169,6 +180,20 @@ function App() {
           phoneNumber="254726745739"
           message="Hello! I need legal assistance from LegalPro."
           position="bottom-right"
+        />
+
+        {/* Toast notifications for chat system */}
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
         />
       </Router>
     </AuthProvider>

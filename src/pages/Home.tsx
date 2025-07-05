@@ -80,10 +80,6 @@ const Home: React.FC = () => {
     <main className="min-h-screen" role="main">
       {/* Hero Section */}
 
-      <section className="relative bg-gradient-to-br from-navy-900 via-navy-800 to-navy-700 text-white overflow-hidden" role="banner" aria-labelledby="hero-heading">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-
       <section className="relative bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 text-white overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary-900/20 to-transparent"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
@@ -294,7 +290,7 @@ const Home: React.FC = () => {
               <WhatsAppConsultationButton
                 size="lg"
                 className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white"
-                message="Hi! I'm interested in scheduling a consultation. Can you help me get started?"
+                // message="Hi! I'm interested in scheduling a consultation. Can you help me get started?"
               />
               <Link to="/contact">
                 <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-navy-800">

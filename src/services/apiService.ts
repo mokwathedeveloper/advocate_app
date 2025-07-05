@@ -1,32 +1,154 @@
-// API service layer for LegalPro v1.0.1
-import axios from 'axios';
+// Enhanced API service layer for LegalPro v1.0.1 - With Loading & Error Handling
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Case, Appointment, Payment, ChatMessage } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// API Configuration
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 30000, // 30 seconds timeout
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Add auth header interceptor
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// Request interceptor for auth and loading
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // Add request timestamp for timeout tracking
+    config.metadata = { startTime: new Date() };
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
+// Response interceptor for error handling
+api.interceptors.response.use(
+  (response: AxiosResponse) => {
+    // Calculate request duration
+    const endTime = new Date();
+    const duration = endTime.getTime() - response.config.metadata?.startTime?.getTime();
+
+    // Log slow requests (>5 seconds)
+    if (duration > 5000) {
+      console.warn(`Slow API request: ${response.config.url} took ${duration}ms`);
+    }
+
+    return response;
+  },
+  (error: AxiosError) => {
+    // Handle different types of errors
+    if (error.code === 'ECONNABORTED') {
+      throw new ApiError('Request timeout. Please check your connection and try again.', 'TIMEOUT', error.response?.status);
+    }
+
+    if (!error.response) {
+      throw new ApiError('Network error. Please check your internet connection.', 'NETWORK_ERROR');
+    }
+
+    const status = error.response.status;
+    const message = error.response.data?.message || error.message;
+
+    switch (status) {
+      case 401:
+        // Handle unauthorized - redirect to login
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+        throw new ApiError('Your session has expired. Please log in again.', 'UNAUTHORIZED', status);
+
+      case 403:
+        throw new ApiError('You do not have permission to perform this action.', 'FORBIDDEN', status);
+
+      case 404:
+        throw new ApiError('The requested resource was not found.', 'NOT_FOUND', status);
+
+      case 422:
+        throw new ApiError(message || 'Invalid data provided.', 'VALIDATION_ERROR', status, error.response.data?.errors);
+
+      case 429:
+        throw new ApiError('Too many requests. Please wait a moment and try again.', 'RATE_LIMIT', status);
+
+      case 500:
+        throw new ApiError('Server error. Please try again later.', 'SERVER_ERROR', status);
+
+      default:
+        throw new ApiError(message || 'An unexpected error occurred.', 'UNKNOWN_ERROR', status);
+    }
+  }
+);
+
+// Custom API Error class
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public status?: number,
+    public validationErrors?: Record<string, string[]>
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+// Retry mechanism with exponential backoff
+const retryRequest = async <T>(
+  requestFn: () => Promise<T>,
+  maxRetries = 3,
+  baseDelay = 1000
+): Promise<T> => {
+  let lastError: Error;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await requestFn();
+    } catch (error) {
+      lastError = error as Error;
+
+      // Don't retry on certain errors
+      if (error instanceof ApiError) {
+        if (['UNAUTHORIZED', 'FORBIDDEN', 'VALIDATION_ERROR'].includes(error.code)) {
+          throw error;
+        }
+      }
+
+      // Don't retry on last attempt
+      if (attempt === maxRetries) {
+        break;
+      }
+
+      // Calculate delay with exponential backoff
+      const delay = baseDelay * Math.pow(2, attempt);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+
+  throw lastError!;
+};
+
+// Enhanced API service with loading states and error handling
 export const apiService = {
   // Cases
   async getCases(params?: any) {
-    const response = await api.get('/cases', { params });
-    return response.data;
+    return retryRequest(async () => {
+      const response = await api.get('/cases', { params });
+      return response.data;
+    });
   },
 
   async getCase(id: string) {
-    const response = await api.get(`/cases/${id}`);
-    return response.data;
+    return retryRequest(async () => {
+      const response = await api.get(`/cases/${id}`);
+      return response.data;
+    });
   },
 
   async createCase(caseData: Partial<Case>) {
@@ -46,13 +168,17 @@ export const apiService = {
 
   // Appointments
   async getAppointments(params?: any) {
-    const response = await api.get('/appointments', { params });
-    return response.data;
+    return retryRequest(async () => {
+      const response = await api.get('/appointments', { params });
+      return response.data;
+    });
   },
 
   async getAppointment(id: string) {
-    const response = await api.get(`/appointments/${id}`);
-    return response.data;
+    return retryRequest(async () => {
+      const response = await api.get(`/appointments/${id}`);
+      return response.data;
+    });
   },
 
   async createAppointment(appointmentData: Partial<Appointment>) {

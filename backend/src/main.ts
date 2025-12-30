@@ -1,20 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
 
-  // Global validation pipe
+  // Global validation pipe with strict settings
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     forbidNonWhitelisted: true,
     transform: true,
+    disableErrorMessages: process.env.NODE_ENV === 'production',
   }));
 
-  // CORS configuration - maintain existing settings
+  // CORS configuration - maintain existing settings for frontend compatibility
   app.enableCors({
-    origin: function (origin, callback) {
+    origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
       if (!origin) return callback(null, true);
       
       const allowedOrigins = [
@@ -36,7 +39,7 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
   });
 
-  const port = process.env.PORT || 5000;
+  const port = configService.get<number>('port') || 5000;
   await app.listen(port);
   console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
 }

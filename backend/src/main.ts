@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -10,6 +11,24 @@ import { RateLimitInterceptor } from './common/interceptors/rate-limit.intercept
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+
+  // Swagger/OpenAPI documentation
+  const config = new DocumentBuilder()
+    .setTitle('LegalPro API')
+    .setDescription('Advocate Case Management System API Documentation')
+    .setVersion('1.0.1')
+    .addBearerAuth()
+    .addTag('Authentication', 'User authentication endpoints')
+    .addTag('Health', 'Health check endpoints')
+    .addTag('User Management', 'User management endpoints')
+    .build();
+  
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document, {
+    customSiteTitle: 'LegalPro API Documentation',
+    customfavIcon: '/favicon.ico',
+    customCss: '.swagger-ui .topbar { display: none }',
+  });
 
   // Global exception filter
   app.useGlobalFilters(new AllExceptionsFilter());
@@ -56,5 +75,6 @@ async function bootstrap() {
   const port = configService.get<number>('port') || 5000;
   await app.listen(port);
   console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
+  console.log(`API Documentation available at http://localhost:${port}/api/docs`);
 }
 bootstrap();

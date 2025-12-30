@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Layout from './components/Layout/Layout';
+import Layout from './components/layout/Layout';
 import { SkipLinks, LiveRegion, AccessibleErrorBoundary } from './components/accessibility/AccessibilityComponents';
 import { useLiveRegion } from './hooks/useAccessibility';
 import Home from './pages/Home';

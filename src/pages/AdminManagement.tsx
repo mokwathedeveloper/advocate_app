@@ -23,7 +23,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
-import UserManagementDashboard from '../components/UserManagement/UserManagementDashboard';
+import UserManagementDashboard from '../components/user-management/UserManagementDashboard';
 import { showToast } from '../services/toastService';
 
 interface AdminFormData {

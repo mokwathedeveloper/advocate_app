@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import configuration from './config/configuration';
 import { validate } from './config/env.validation';
@@ -14,7 +14,18 @@ import { UsersModule } from './users/users.module';
       load: [configuration],
       validate,
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URI!),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const uri = configService.get<string>('MONGODB_URI');
+        if (!uri) {
+          console.log('No MongoDB URI provided, skipping database connection');
+          return {};
+        }
+        return { uri };
+      },
+      inject: [ConfigService],
+    }),
     HealthModule,
     AuthModule,
     UsersModule,

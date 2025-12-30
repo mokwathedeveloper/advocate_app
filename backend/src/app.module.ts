@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import configuration from './config/configuration';
 import { validate } from './config/env.validation';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { validate } from './config/env.validation';
       validate,
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI!),
+    HealthModule,
   ],
   controllers: [],
   providers: [],

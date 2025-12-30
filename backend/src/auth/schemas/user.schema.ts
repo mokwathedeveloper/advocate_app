@@ -56,6 +56,9 @@ export class User {
   lastLogin?: Date;
 
   @Prop({ default: false })
+  isTemporaryPassword!: boolean;
+
+  @Prop({ default: false })
   isEmailVerified!: boolean;
 
   async matchPassword(enteredPassword: string): Promise<boolean> {

@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import NotificationCenter from '../notifications/NotificationCenter';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,9 +31,6 @@ const Navbar: React.FC = () => {
     { path: '/', label: 'Home', icon: Home },
     { path: '/about', label: 'About', icon: User },
     { path: '/practice-areas', label: 'Practice Areas', icon: Scale },
-    { path: '/areas-we-serve', label: 'Areas We Serve', icon: null },
-    { path: '/resources', label: 'Resources', icon: FileText },
-    { path: '/locations', label: 'Locations', icon: null },
     { path: '/contact', label: 'Contact', icon: MessageSquare },
   ];
 
@@ -60,7 +56,6 @@ const Navbar: React.FC = () => {
     { path: '/messages', label: 'Messages', icon: MessageSquare },
     { path: '/clients', label: 'Clients', icon: Users },
     { path: '/admin-management', label: 'Admin Management', icon: Shield },
-    { path: '/system-settings', label: 'System Settings', icon: Settings },
   ];
 
   const getNavItems = () => {
@@ -100,18 +95,14 @@ const Navbar: React.FC = () => {
   };
 
   return (
-
-    <nav className="bg-white shadow-lg relative z-50" role="navigation" aria-label="Main navigation">
-
-    <nav className="bg-white dark:bg-neutral-800 shadow-lg border-b border-neutral-200 dark:border-neutral-700 relative z-50">
-
+    <nav className="bg-white shadow-lg relative z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2 group">
               <Scale className="h-8 w-8 text-primary-600 group-hover:text-primary-700 transition-colors" />
-              <span className="text-xl font-bold text-primary-800 dark:text-primary-400 group-hover:text-primary-900 dark:group-hover:text-primary-300 transition-colors">
+              <span className="text-xl font-bold text-primary-800 group-hover:text-primary-900 transition-colors">
                 LegalPro
               </span>
             </Link>
@@ -123,18 +114,13 @@ const Navbar: React.FC = () => {
               <Link
                 key={item.path}
                 to={item.path}
-
-                className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
-
                 className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-
                   isActive(item.path)
-                    ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 shadow-sm'
-                    : 'text-neutral-700 dark:text-neutral-300 hover:text-primary-700 dark:hover:text-primary-400 hover:bg-neutral-100 dark:hover:bg-neutral-700'
+                    ? 'bg-primary-100 text-primary-800 shadow-sm'
+                    : 'text-gray-700 hover:text-primary-700 hover:bg-gray-100'
                 }`}
-                aria-current={isActive(item.path) ? 'page' : undefined}
               >
-                {item.icon && <item.icon className="h-4 w-4" aria-hidden="true" />}
+                {item.icon && <item.icon className="h-4 w-4" />}
                 <span>{item.label}</span>
               </Link>
             ))}
@@ -142,31 +128,19 @@ const Navbar: React.FC = () => {
             {/* User Menu or Auth Buttons */}
             <div className="flex items-center space-x-4">
               {user ? (
-                <>
-                  {/* Notification Center */}
-                  <NotificationCenter />
-
-                  <div className="relative">
+                <div className="relative">
                   <button
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center space-x-3 text-neutral-700 dark:text-neutral-300 hover:text-primary-700 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-800 rounded-lg p-2 transition-all duration-200"
+                    className="flex items-center space-x-3 text-gray-700 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-lg p-2"
                   >
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${
-                      user.role === 'advocate'
-                        ? 'bg-secondary-100 dark:bg-secondary-900/30'
-                        : 'bg-primary-100 dark:bg-primary-900/30'
-                    }`}>
-                      {user.role === 'advocate' ? (
-                        <Scale className="h-5 w-5 text-secondary-600 dark:text-secondary-400" />
-                      ) : (
-                        <User className="h-5 w-5 text-primary-600 dark:text-primary-400" />
-                      )}
+                    <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                      <User className="h-5 w-5 text-primary-600" />
                     </div>
                     <div className="text-left">
-                      <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                      <span className="text-sm font-medium text-gray-900">
                         {user.firstName} {user.lastName}
                       </span>
-                      <div className="text-xs text-neutral-500 dark:text-neutral-400">
+                      <div className="text-xs text-gray-500">
                         {getRoleDisplay(user.role)}
                       </div>
                     </div>
@@ -178,30 +152,20 @@ const Navbar: React.FC = () => {
                         initial={{ opacity: 0, y: -10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        className="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 py-2 z-50"
+                        className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border py-2 z-50"
                       >
                         <Link
                           to="/profile"
-                          className="flex items-center px-4 py-3 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 hover:text-primary-700 dark:hover:text-primary-400 transition-colors"
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
                           <Settings className="h-4 w-4 mr-3" />
                           Profile Settings
                         </Link>
-                        {user.role === 'advocate' && (
-                          <Link
-                            to="/admin-management"
-                            className="flex items-center px-4 py-3 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 hover:text-primary-700 dark:hover:text-primary-400 transition-colors"
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <Shield className="h-4 w-4 mr-3" />
-                            Admin Management
-                          </Link>
-                        )}
-                        <hr className="my-2 border-neutral-200 dark:border-neutral-700" />
+                        <hr className="my-2" />
                         <button
                           onClick={handleLogout}
-                          className="flex items-center w-full px-4 py-3 text-sm text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-900/20 transition-colors"
+                          className="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50"
                         >
                           <LogOut className="h-4 w-4 mr-3" />
                           Sign Out
@@ -210,18 +174,17 @@ const Navbar: React.FC = () => {
                     )}
                   </AnimatePresence>
                 </div>
-                </>
               ) : (
                 <div className="flex items-center space-x-3">
                   <Link
                     to="/login"
-                    className="text-neutral-700 dark:text-neutral-300 hover:text-primary-700 dark:hover:text-primary-400 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                    className="text-gray-700 hover:text-primary-700 px-3 py-2 rounded-lg text-sm font-medium"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
-                    className="bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-800"
+                    className="bg-primary-600 text-white hover:bg-primary-700 px-4 py-2 rounded-lg text-sm font-medium"
                   >
                     Get Started
                   </Link>
@@ -234,19 +197,12 @@ const Navbar: React.FC = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-
-              className="text-neutral-700 hover:text-primary-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 p-2 rounded-md"
-              aria-expanded={isMenuOpen}
-              aria-controls="mobile-menu"
-              aria-label={isMenuOpen ? 'Close main menu' : 'Open main menu'}
-
-              className="text-neutral-700 dark:text-neutral-300 hover:text-primary-700 dark:hover:text-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-800 p-2 rounded-lg transition-colors"
-
+              className="text-gray-700 hover:text-primary-800 focus:outline-none p-2 rounded-md"
             >
               {isMenuOpen ? (
-                <X className="h-6 w-6" aria-hidden="true" />
+                <X className="h-6 w-6" />
               ) : (
-                <Menu className="h-6 w-6" aria-hidden="true" />
+                <Menu className="h-6 w-6" />
               )}
             </button>
           </div>
@@ -260,24 +216,17 @@ const Navbar: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-
             className="md:hidden bg-white border-t"
-            id="mobile-menu"
-            role="menu"
-            aria-label="Mobile navigation menu"
-
-            className="md:hidden bg-white dark:bg-neutral-800 border-t border-neutral-200 dark:border-neutral-700"
-
           >
             <div className="px-4 pt-4 pb-3 space-y-2">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-base font-medium transition-all duration-200 ${
+                  className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-base font-medium ${
                     isActive(item.path)
-                      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 shadow-sm'
-                      : 'text-neutral-700 dark:text-neutral-300 hover:text-primary-700 dark:hover:text-primary-400 hover:bg-neutral-100 dark:hover:bg-neutral-700'
+                      ? 'bg-primary-100 text-primary-800'
+                      : 'text-gray-700 hover:text-primary-700 hover:bg-gray-100'
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -292,30 +241,12 @@ const Navbar: React.FC = () => {
                     {user.firstName} {user.lastName}
                     <div className="text-xs">{getRoleDisplay(user.role)}</div>
                   </div>
-                  <Link
-                    to="/profile"
-                    className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Settings className="h-5 w-5" />
-                    <span>Profile Settings</span>
-                  </Link>
-                  {user.role === 'advocate' && (
-                    <Link
-                      to="/admin-management"
-                      className="flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Shield className="h-5 w-5" />
-                      <span>Admin Management</span>
-                    </Link>
-                  )}
                   <button
                     onClick={() => {
                       handleLogout();
                       setIsMenuOpen(false);
                     }}
-                    className="flex items-center space-x-2 w-full px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
+                    className="flex items-center space-x-2 w-full px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100"
                   >
                     <LogOut className="h-5 w-5" />
                     <span>Sign Out</span>
@@ -325,14 +256,14 @@ const Navbar: React.FC = () => {
                 <div className="border-t pt-2 mt-2 space-y-1">
                   <Link
                     to="/login"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-navy-800 hover:bg-gray-100"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
-                    className="block px-3 py-2 rounded-md text-base font-medium bg-navy-800 text-white hover:bg-navy-700"
+                    className="block px-3 py-2 rounded-md text-base font-medium bg-primary-800 text-white hover:bg-primary-700"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Get Started

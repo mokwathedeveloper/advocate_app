@@ -1,5 +1,5 @@
 // Appointment service for LegalPro v1.0.1
-import api from './apiService';
+import { apiService } from './apiService';
 
 export interface Appointment {
   _id: string;
@@ -218,31 +218,31 @@ class AppointmentService {
       }
     });
 
-    const response = await api.get(`/appointments?${params.toString()}`);
+    const response = await apiService.getAppointments(filters);
     return response.data;
   }
 
   // Get single appointment
   async getAppointment(id: string) {
-    const response = await api.get(`/appointments/${id}`);
+    const response = await apiService.getAppointment(id);
     return response.data;
   }
 
   // Create new appointment
   async createAppointment(data: CreateAppointmentData) {
-    const response = await api.post('/appointments', data);
+    const response = await apiService.createAppointment(data);
     return response.data;
   }
 
   // Update appointment
   async updateAppointment(id: string, data: UpdateAppointmentData) {
-    const response = await api.put(`/appointments/${id}`, data);
+    const response = await apiService.updateAppointment(id, data);
     return response.data;
   }
 
   // Cancel appointment
   async cancelAppointment(id: string, reason?: string) {
-    const response = await api.put(`/appointments/${id}/cancel`, { reason });
+    const response = await apiService.cancelAppointment(id);
     return response.data;
   }
 
